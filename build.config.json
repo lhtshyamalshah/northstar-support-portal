@@ -1,0 +1,14 @@
+{
+  "services": [
+    {
+      "name": "backend",
+      "cwd": ".",
+      "install": "npm install",
+      "build": "npm run build",
+      "test": "npm test",
+      "start": "node server.mjs",
+      "entrypoint": "server.mjs",
+      "port": 4000
+    }
+  ]
+}

@@ -1,0 +1,29 @@
+{
+  "services": [
+    {
+      "name": "backend",
+      "role": "backend",
+      "prerequisites": [
+        "npm --prefix package/zbrain-governance-sdk install --engine-strict=false",
+        "npm --prefix package/zbrain-governance-sdk run build",
+        "npm install"
+      ],
+      "command": "node server.mjs",
+      "cwd": ".",
+      "readinessPath": "/api/health"
+    },
+    {
+      "name": "frontend",
+      "role": "frontend",
+      "prerequisites": [
+        "npm install"
+      ],
+      "command": "npm run dev:client",
+      "cwd": ".",
+      "readinessPattern": "ready in",
+      "dependsOn": [
+        "backend"
+      ]
+    }
+  ]
+}

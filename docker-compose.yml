@@ -1,0 +1,18 @@
+services:
+  backend:
+    image: app-backend:latest
+    build: .
+    restart: unless-stopped
+    ports:
+      - "${APP_PORT:-3000}:4000"
+    environment:
+      - NODE_ENV=production
+      - PORT=4000
+      - ZBRAIN_GOVERNANCE=${ZBRAIN_GOVERNANCE:-true}
+      - ZBRAIN_GOVERNANCE_BASE_URL
+      - ZBRAIN_GOVERNANCE_API_KEY
+      - ZBRAIN_GOVERNANCE_SOLUTION_ID
+      - ZBRAIN_GOVERNANCE_DEPLOYMENT_ID
+      - ZBRAIN_GOVERNANCE_CANARY_TOKEN
+      - OPENAI_API_KEY
+      - OPENAI_MODEL

@@ -1,0 +1,71 @@
+{
+  "name": "@zbrain/governance-sdk",
+  "version": "0.1.0",
+  "description": "TypeScript codebase for the zbrain-governance git submodule.",
+  "private": true,
+  "license": "UNLICENSED",
+  "type": "module",
+  "main": "./dist/index.cjs",
+  "module": "./dist/index.js",
+  "types": "./dist/index.d.ts",
+  "exports": {
+    ".": {
+      "import": {
+        "types": "./dist/index.d.ts",
+        "default": "./dist/index.js"
+      },
+      "require": {
+        "types": "./dist/index.d.cts",
+        "default": "./dist/index.cjs"
+      },
+      "default": "./dist/index.js"
+    }
+  },
+  "files": [
+    "dist"
+  ],
+  "engines": {
+    "node": ">=22.0.0",
+    "npm": ">=10.0.0"
+  },
+  "packageManager": "npm@10.9.8",
+  "overrides": {
+    "esbuild": "0.28.1"
+  },
+  "scripts": {
+    "build": "tsup",
+    "benchmark:prompt-injection": "tsx test/benchmarks/prompt-injection-benchmark.ts",
+    "clean": "node -e \"const fs=require('node:fs'); fs.rmSync('dist',{recursive:true,force:true}); fs.rmSync('coverage',{recursive:true,force:true});\"",
+    "coverage": "vitest run --coverage",
+    "dev": "tsup --watch",
+    "format": "prettier . --write",
+    "format:check": "prettier . --check",
+    "lint": "eslint src test *.config.ts --max-warnings=0",
+    "test": "vitest run",
+    "test:watch": "vitest",
+    "test:package": "node --input-type=module --eval \"import { initializeGovernanceSDK } from '@zbrain/governance-sdk'; if (typeof initializeGovernanceSDK !== 'function') process.exit(1);\" && node --eval \"const { initializeGovernanceSDK } = require('@zbrain/governance-sdk'); if (typeof initializeGovernanceSDK !== 'function') process.exit(1);\"",
+    "typecheck": "tsc --noEmit",
+    "validate": "npm run format:check && npm run lint && npm run typecheck && npm run test && npm run build && npm run test:package"
+  },
+  "devDependencies": {
+    "@eslint/js": "10.0.1",
+    "@types/node": "24.13.3",
+    "@vitest/coverage-v8": "4.1.10",
+    "eslint": "10.6.0",
+    "prettier": "3.9.4",
+    "tsup": "8.5.1",
+    "tsx": "4.23.1",
+    "typescript": "6.0.3",
+    "typescript-eslint": "8.63.0",
+    "vitest": "4.1.10"
+  },
+  "allowScripts": {
+    "esbuild@0.28.1": true,
+    "re2@1.24.1": true
+  },
+  "dependencies": {
+    "axios": "1.18.1",
+    "node-cron": "4.6.0",
+    "re2": "1.24.1"
+  }
+}

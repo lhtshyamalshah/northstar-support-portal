@@ -1,0 +1,35 @@
+[
+  {
+    "name": "OpenAI",
+    "description": "Powers the Nova support and Sage billing agents via the Responses API",
+    "logo": "https://icon.horse/icon/openai.com",
+    "configuration": {
+      "OPENAI_API_KEY": {
+        "description": "Secret API key. Without it the portal falls back to deterministic demo replies.",
+        "type": "PASSWORD",
+        "label": "API Key",
+        "required": true
+      },
+      "OPENAI_MODEL": {
+        "description": "Model id used by both support agents",
+        "type": "TEXT",
+        "label": "Model",
+        "required": false,
+        "default": "gpt-4.1-mini"
+      }
+    }
+  },
+  {
+    "name": "ZBrain Governance",
+    "description": "Enterprise policy and Governance SDK authentication",
+    "logo": "https://icon.horse/icon/zbrain.ai",
+    "configuration": {
+      "ZBRAIN_GOVERNANCE_API_KEY": {
+        "description": "Governance SDK API key",
+        "type": "PASSWORD",
+        "label": "API Key",
+        "required": true
+      }
+    }
+  }
+]

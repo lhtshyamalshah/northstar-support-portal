@@ -1,0 +1,51 @@
+{
+  "agents": [
+    {
+      "agentKey": "support",
+      "agentDid": "did:zbrain:northstar-support:agent:support",
+      "name": "Nova Support Agent",
+      "capabilities": ["support.answer", "order.lookup"],
+      "tools": ["did:zbrain:northstar-support:tool:lookup-order"],
+      "riskTier": "LOW",
+      "riskScore": 0.3,
+      "metadata": {
+        "owner": "northstar-support",
+        "surface": "POST /api/chat",
+        "provider": "openai",
+        "dataDomain": "store-orders"
+      }
+    },
+    {
+      "agentKey": "billing",
+      "agentDid": "did:zbrain:northstar-support:agent:billing",
+      "name": "Sage Billing Agent",
+      "capabilities": ["billing.answer", "order.lookup"],
+      "tools": ["did:zbrain:northstar-support:tool:lookup-order"],
+      "riskTier": "MEDIUM",
+      "riskScore": 0.45,
+      "metadata": {
+        "owner": "northstar-support",
+        "surface": "POST /api/chat",
+        "provider": "openai",
+        "dataDomain": "store-orders"
+      }
+    }
+  ],
+  "tools": [
+    {
+      "key": "lookup-order",
+      "toolDid": "did:zbrain:northstar-support:tool:lookup-order",
+      "capability": "order.lookup",
+      "resources": ["northstar.orders"],
+      "category": "read",
+      "riskTier": "LOW",
+      "metadata": {
+        "implementation": "lookupOrder() over the in-memory seeded orders array",
+        "sideEffects": "none",
+        "dataClassification": "internal"
+      }
+    }
+  ],
+  "capabilities": ["support.answer", "billing.answer", "order.lookup"],
+  "resources": ["northstar.orders"]
+}

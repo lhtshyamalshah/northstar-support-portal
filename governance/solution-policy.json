@@ -1,0 +1,135 @@
+{
+  "name": "Northstar Support Portal Solution Policies",
+  "version": "1.0.0",
+  "rules": [
+    {
+      "name": "Northstar Deny Prompt Canary Leak",
+      "level": "solution",
+      "kind": "validation",
+      "checkpoint": "validation_lifecycle",
+      "priority": 998,
+      "enabled": true,
+      "action": "deny",
+      "reason": "Support prompts carry session canaries; any echo of one indicates prompt extraction.",
+      "condition": {
+        "checks": {
+          "in": ["canaryLeak"]
+        }
+      }
+    },
+    {
+      "name": "Northstar Allow Support Order Lookup",
+      "level": "solution",
+      "kind": "context",
+      "checkpoint": "tool_call",
+      "priority": 400,
+      "enabled": true,
+      "action": "allow",
+      "reason": "The Nova support agent may read a customer-supplied order through the order lookup tool.",
+      "condition": {
+        "agent.agentKey": {
+          "eq": "support"
+        },
+        "tool.key": {
+          "eq": "lookup-order"
+        }
+      }
+    },
+    {
+      "name": "Northstar Allow Billing Order Lookup",
+      "level": "solution",
+      "kind": "context",
+      "checkpoint": "tool_call",
+      "priority": 400,
+      "enabled": true,
+      "action": "allow",
+      "reason": "The Sage billing agent may read a customer-supplied order through the order lookup tool.",
+      "condition": {
+        "agent.agentKey": {
+          "eq": "billing"
+        },
+        "tool.key": {
+          "eq": "lookup-order"
+        }
+      }
+    },
+    {
+      "name": "Northstar Allow Support To Billing Handoff",
+      "level": "solution",
+      "kind": "context",
+      "checkpoint": "handoff",
+      "priority": 400,
+      "enabled": true,
+      "action": "allow",
+      "reason": "The support router may transfer a billing conversation from Nova to Sage.",
+      "condition": {
+        "agent.agentKey": {
+          "eq": "support"
+        },
+        "handoff.agentKey": {
+          "eq": "billing"
+        }
+      }
+    },
+    {
+      "name": "Northstar Deny Order Lookup Burst",
+      "level": "solution",
+      "kind": "context",
+      "checkpoint": "tool_call",
+      "priority": 700,
+      "enabled": true,
+      "action": "deny",
+      "reason": "A single conversation may not read the order desk more than eight times.",
+      "condition": {
+        "usage.perToolCallCount": {
+          "gte": 8
+        }
+      }
+    },
+    {
+      "name": "Northstar Deny Excessive Agent Model Calls",
+      "level": "solution",
+      "kind": "context",
+      "checkpoint": "model_call",
+      "priority": 700,
+      "enabled": true,
+      "action": "deny",
+      "reason": "Each support agent is limited to ten model calls per conversation.",
+      "condition": {
+        "usage.modelCallPerAgentCount": {
+          "gte": 10
+        }
+      }
+    },
+    {
+      "name": "Northstar Deny Oversized Support Prompt",
+      "level": "solution",
+      "kind": "context",
+      "checkpoint": "model_call",
+      "priority": 700,
+      "enabled": true,
+      "action": "deny",
+      "reason": "Support prompts are short by design; an oversized prompt indicates abuse of the chat endpoint.",
+      "condition": {
+        "model.inputTokens": {
+          "gt": 12000
+        }
+      }
+    },
+    {
+      "name": "Northstar Audit Order Lookup Result",
+      "level": "solution",
+      "kind": "context",
+      "checkpoint": "tool_result",
+      "priority": 200,
+      "enabled": true,
+      "action": "audit",
+      "reason": "Order records returned to a model are auditable customer data.",
+      "condition": {
+        "tool.key": {
+          "eq": "lookup-order"
+        }
+      }
+    }
+  ]
+}
