@@ -1,0 +1,9 @@
+node_modules
+dist
+.git
+.env
+.claude
+.zbrain
+*.image.tar.gz
+package/zbrain-governance-sdk/node_modules
+package/zbrain-governance-sdk/dist

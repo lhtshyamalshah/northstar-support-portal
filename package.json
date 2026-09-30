@@ -4,22 +4,27 @@
   "private": true,
   "type": "module",
   "scripts": {
+    "prestart": "npm run build:sdk",
     "start": "node server.mjs",
     "dev": "concurrently \"npm run dev:server\" \"npm run dev:client\"",
     "dev:server": "node --watch server.mjs",
     "dev:client": "vite",
     "build": "vite build",
-    "preview": "vite preview"
+    "preview": "vite preview",
+    "build:sdk": "npm --prefix package/zbrain-governance-sdk install --engine-strict=false --no-audit --no-fund && npm --prefix package/zbrain-governance-sdk run build",
+    "test": "node --test \"test/**/*.test.mjs\""
   },
   "dependencies": {
     "express": "^5.1.0",
-    "openai": "^6.0.0"
+    "openai": "^6.0.0",
+    "@zbrain/governance-sdk": "file:package/zbrain-governance-sdk"
   },
   "devDependencies": {
     "@vitejs/plugin-react": "^5.0.0",
     "concurrently": "^9.2.1",
     "vite": "^7.0.0",
     "react": "^19.0.0",
-    "react-dom": "^19.0.0"
+    "react-dom": "^19.0.0",
+    "@babel/parser": "^7.29.0"
   }
 }
