@@ -79,10 +79,10 @@
       "priority": 700,
       "enabled": true,
       "action": "deny",
-      "reason": "A single conversation may not read the order desk more than eight times.",
+      "reason": "A single conversation may not read the order desk more than ten times.",
       "condition": {
         "usage.perToolCallCount": {
-          "gte": 8
+          "gte": 10
         }
       }
     },
