@@ -18,7 +18,7 @@ function Header({ admin = false }) {
     <header className={`topbar ${admin ? "admin-topbar" : ""}`}>
       <a className="wordmark" href="/" aria-label="Northstar support home">Northstar<span>®</span></a>
       <nav aria-label="Primary navigation">
-        {admin ? <a href="/">Support <span aria-hidden="true">↗</span></a> : <><a href="#policies">Help center</a><a href="/admin">Order desk <span aria-hidden="true">↗</span></a></>}
+        {admin ? <a href="/">Support <span aria-hidden="true">↗</span></a> : <><a href="#policies">Support center</a><a href="/admin">Order desk <span aria-hidden="true">↗</span></a></>}
       </nav>
     </header>
   );
