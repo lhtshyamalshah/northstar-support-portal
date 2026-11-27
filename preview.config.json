@@ -4,8 +4,7 @@
       "name": "backend",
       "role": "backend",
       "prerequisites": [
-        "npm --prefix package/zbrain-governance-sdk install --engine-strict=false",
-        "npm --prefix package/zbrain-governance-sdk run build",
+        "node scripts/build-sdk.mjs",
         "npm install"
       ],
       "command": "node server.mjs",

@@ -25,5 +25,7 @@ check "backend health" "$BASE/api/health" '"ok":true'
 check "SPA shell" "$BASE/" 'id="root"'
 # Read-only API route that proves the order data is reachable.
 check "orders API" "$BASE/api/orders" '"orders"'
+# Leave days must refuse a caller without a sign-in.
+check "leave days needs sign-in" "$BASE/api/leave-days" 'Sign in to see your leave days'
 
 exit $FAIL

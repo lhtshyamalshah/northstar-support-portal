@@ -11,20 +11,21 @@
     "dev:client": "vite",
     "build": "vite build",
     "preview": "vite preview",
-    "build:sdk": "npm --prefix package/zbrain-governance-sdk install --engine-strict=false --no-audit --no-fund && npm --prefix package/zbrain-governance-sdk run build",
+    "build:sdk": "node scripts/build-sdk.mjs",
     "test": "node --test \"test/**/*.test.mjs\""
   },
   "dependencies": {
+    "@azure/msal-node": "^7.2.3",
+    "@zbrain/governance-sdk": "file:package/zbrain-governance-sdk",
     "express": "^5.1.0",
-    "openai": "^6.0.0",
-    "@zbrain/governance-sdk": "file:package/zbrain-governance-sdk"
+    "openai": "^6.0.0"
   },
   "devDependencies": {
+    "@babel/parser": "^7.29.0",
     "@vitejs/plugin-react": "^5.0.0",
     "concurrently": "^9.2.1",
-    "vite": "^7.0.0",
     "react": "^19.0.0",
     "react-dom": "^19.0.0",
-    "@babel/parser": "^7.29.0"
+    "vite": "^7.0.0"
   }
 }
