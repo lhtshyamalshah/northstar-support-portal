@@ -1,6 +1,6 @@
 # Architecture: Northstar Support Portal
 
-The app has two parts: the Web app in the browser, and the Portal service, which serves it and the API. The Portal service runs as one Docker container in the customer's AWS account and finds orders by identifier (ID). The leave days page adds one Web app path and one endpoint, using Microsoft Entra ID and Workday. The design keeps the existing JavaScript, React, Express and governance code.
+The app has two parts: the Web app in the browser, and the Portal service, which serves it and the API. The Portal service runs as one Docker container in the customer's AWS account and finds orders by identifier (ID). For the leave days page, it signs employees in with Microsoft Entra ID and reads Workday with its own system account. The design keeps the existing JavaScript, React, Express and governance code.
 
 ## Stack and templates
 The app keeps its own stack and starts from no new template.
@@ -13,8 +13,8 @@ The app keeps its own stack and starts from no new template.
 | Model access | Existing OpenAI software development kit (SDK), Responses API | Nova and Sage already run on it (FR-04). | The OpenAI Agents SDK: it means rewriting working assistants. | The app maintains its own tool loop. |
 | AI governance | Existing ZBrain Governance SDK in `package/` | It carries the governance rules (FR-34 to FR-40). | Removing it: those requirements lose their cover. | Startup depends on the ZBrain Governance service. |
 | Data storage | Process memory, no database | Sample orders reset on restart (FR-48), and Workday holds leave (FR-52). | A database: no requirement keeps data across restarts. | Each running copy has its own orders and chat counts. |
-| Company sign-in | Microsoft Entra ID | The requester named it (FR-51). | Accounts inside the app: FR-51 requires the company sign-in. | The company must register the app. Q24 decides the library. |
-| HR system | Workday, read on each request | The requester named it, and the page shows today's recorded number (FR-52). | A copy of leave data in the app: it goes out of date. | The page depends on Workday being reachable. |
+| Company sign-in | Microsoft Entra ID, handled by the Portal service with `@azure/msal-node` and a session cookie | The requester named Entra ID (FR-51), and Q24 puts sign-in on the server. | Sign-in code written by hand: the app would own every protocol check. | One new library, and the Portal service holds an app credential. |
+| HR system | Workday, read on each request with the app's own system account | The requester named it (FR-52), and Q26 chose the account. | A copy of leave data in the app: it goes out of date. | The account reaches other employees' balances, and the page depends on Workday. |
 
 ## Workspace layout
 The app stays at the repository root, with one new server module and no new folder.
@@ -32,7 +32,7 @@ zbrain-docs/   Planning documents
 ```
 
 ## Environment variables
-The platform supplies these at run time, and Q24 and Q26 add the credential variables.
+The platform supplies these at run time, and Q33 and Q34 add the credential variables.
 
 ### Web app
 | Name | Purpose | Secret | Example |
@@ -57,11 +57,13 @@ The platform supplies these at run time, and Q24 and Q26 add the credential vari
 | `CRON_TIME` | Schedule for refreshing governance rules | No | `0 */6 * * *` |
 | `ENTRA_TENANT_ID` | New: the company's Microsoft Entra ID tenant | No | none |
 | `ENTRA_CLIENT_ID` | New: the app's registration in that tenant | No | none |
+| `ENTRA_REDIRECT_URI` | New: public address of `/api/auth/callback`, as registered in that tenant | No | none |
 | `WORKDAY_BASE_URL` | New: address of the Workday API | No | none |
 | `WORKDAY_TENANT` | New: the company's Workday tenant | No | none |
+| `WORKDAY_ANNUAL_LEAVE_PLAN` | New: names the one Workday leave plan that holds annual leave | No | none |
 
 ## Components
-Two components run the app, and in development Vite serves the Web app and passes `/api` calls on.
+Two components run the app, in development Vite passes `/api` calls on, and Q38 settles where sessions live.
 
 | Component | Type and technology | Runs on | Owns data | FR ids |
 | --- | --- | --- | --- | --- |
@@ -94,13 +96,16 @@ These flows cover the journeys that call an outside system.
 
 ### Employee: see leave days left
 1. Web app opens `/leave` and asks the Portal service for the leave days.
-2. Employee signs in through Microsoft Entra ID, and the Web app or Portal service handles it (Q24).
-3. Portal service validates the sign-in and takes the employee's identity from it.
-4. Portal service finds the employee's Workday record, matched as Q25 settles.
-5. Portal service reads today's annual leave balance from Workday (Q26, Q27, Q28).
-6. Portal service returns the number unchanged, and the Web app shows it.
+2. Portal service answers 401 without a session, and the Web app opens `/api/auth/sign-in`.
+3. Portal service redirects the browser to Microsoft Entra ID, where the employee signs in.
+4. Portal service receives the browser back from Microsoft Entra ID and validates the sign-in.
+5. Portal service starts a session for the work email, sets the cookie and returns the browser to `/leave`.
+6. Web app asks the Portal service for the leave days again.
+7. Portal service finds the one Workday record with that work email, using the app's system account.
+8. Portal service reads today's balance of the configured annual leave plan (Q28 settles the date).
+9. Portal service returns the number unchanged, and the Web app shows it.
 
-Three questions in functional-requirements.md are Open, so this design gives their cases no behaviour. They are Q6 (no leave number), Q19 (sign-in or Workday unavailable) and Q23 (a person who cannot sign in).
+A work email that matches no Workday record, or more than one, gets no number. Three questions in functional-requirements.md are Open, so this design gives their cases no behaviour. They are Q6 (no leave number), Q19 (sign-in or Workday unavailable) and Q23 (a person who cannot sign in).
 
 ## Integrations
 The app calls these outside systems.
@@ -109,22 +114,24 @@ The app calls these outside systems.
 | --- | --- | --- | --- | --- |
 | OpenAI | Gets Nova's and Sage's replies through the Responses API | Out from the Portal service | API key | FR-04, FR-09, FR-33 |
 | ZBrain Governance service | Registers the app, gets policy rules, sends audit and violation records | Out from the Portal service | Bearer API key | FR-34, FR-39, FR-40 |
-| Microsoft Entra ID | Signs employees in and says who is looking | Browser redirect and Portal service check | Company account for employees; app credential per Q24 | FR-51 |
-| Workday | Reads one employee's annual leave balance as of today | Out from the Portal service, read only | Open: Q26 | FR-47, FR-52 |
+| Microsoft Entra ID | Signs employees in and supplies their work email | Browser redirect, and out from the Portal service | Company account for employees; app credential per Q33 | FR-51 |
+| Workday | Finds one employee by work email and reads their annual leave balance as of today | Out from the Portal service, read only | The app's system account, limited to leave balances; Q34 and Q36 settle the details | FR-47, FR-52 |
 | Google Fonts | Loads the page fonts, as index.html does today | Out from the Web app | None | Whole app |
 
 ## API contract
 ### Portal service
-Callers send no sign-in, except on `GET /api/leave-days`, which needs a company sign-in. In production, other paths outside `/api/` return the Web app. Q24 decides the sign-in routes, so this table lists none.
+Callers send no sign-in, except on `GET /api/leave-days`, which needs the session cookie. In production, other paths outside `/api/` return the Web app. The sign-in routes sit under `/api/`, so the development proxy passes them on.
 
 | Method and path | Caller | Purpose | Request | Responses | FR ids |
 | --- | --- | --- | --- | --- | --- |
 | `GET /api/health` | Deploy smoke script | Report running state | None | 200 `ok`, `aiEnabled`, `model` | FR-50 |
 | `GET /api/orders` | Web app | List sample orders | None | 200 `orders` | FR-41, FR-42 |
 | `POST /api/chat` | Web app | Answer a chat message | `message`, `history`, `activeAgent` | 200 `agent`, `handoff`, `reply`, `source`; 400 blank message; 500 `error` | FR-04, FR-07, FR-15, FR-26 |
-| `GET /api/leave-days` | Web app | Return the signed-in employee's leave days left | No fields: the sign-in names the employee | 200 `daysLeft`; 401 no valid company sign-in | FR-47, FR-51, FR-52 |
+| `GET /api/auth/sign-in` | Web app | Start the company sign-in | None | 302 to Microsoft Entra ID | FR-51 |
+| `GET /api/auth/callback` | Web app | Receive the sign-in result and start the session | `code`, `state` | 302 to `/leave` with the session cookie | FR-51 |
+| `GET /api/leave-days` | Web app | Return the signed-in employee's leave days left | No fields: the session names the employee | 200 `daysLeft`; 401 no valid session | FR-47, FR-51, FR-52 |
 
-Q6, Q19 and Q23 in functional-requirements.md decide the other outcomes of `GET /api/leave-days`.
+Q6, Q19 and Q23 in functional-requirements.md decide the failure outcomes of the sign-in routes and `GET /api/leave-days`.
 
 ## AI components
 The two existing assistants stay as they are, and the leave days page uses no AI.
@@ -168,15 +175,18 @@ Each technical requirement (TR) covers today's app or the leave days page. Where
 | TR-20 | Feature | Every page, including leave days, must follow the stylesheet's layout for screens 650 pixels wide or narrower. | FR-49 |
 | TR-21 | Feature | `GET /api/health` must report that the app runs, whether the AI service is connected, and the model. | FR-50 |
 | TR-22 | Feature | The Web app must show every visitor of the support page a link to `/leave`. | FR-53 |
-| TR-23 | Feature | The Portal service must return leave data only for a valid sign-in from the company's Microsoft Entra ID tenant. | FR-47, FR-51 |
-| TR-24 | Feature | The Portal service must take the employee's identity only from that sign-in, never from request input. | FR-47, FR-51 |
-| TR-25 | Feature | The Portal service must read today's annual leave balance from Workday and return the number unchanged. | FR-47, FR-52 |
+| TR-23 | Feature | The Portal service must start a session only after validating a sign-in from the company's Microsoft Entra ID tenant. | FR-47, FR-51 |
+| TR-24 | Feature | The Portal service must take the employee's work email only from the sign-in session, never from request input. | FR-47, FR-51 |
+| TR-25 | Feature | The Portal service must read today's balance of the configured annual leave plan from Workday and return it unchanged. | FR-47, FR-52 |
 | TR-26 | Feature | The leave days page must offer nothing besides the leave days left. | FR-47 |
 | TR-27 | Feature | The Portal service must require the company sign-in for leave days only, leaving chat and orders open. | FR-42, FR-51 |
+| TR-37 | Feature | The Portal service must return a number only when exactly one Workday record has the signed-in work email. | FR-47, FR-52 |
+| TR-38 | Feature | The session cookie must carry the `HttpOnly`, `Secure` and `SameSite=Lax` attributes. | FR-47, FR-51 |
+| TR-39 | Feature | The Portal service must call Workday only with the app's system account. | FR-47, FR-52 |
 | TR-28 | Quality | The Portal service must read Workday on every leave days request and never store the number. | FR-52 |
-| TR-29 | Quality | Responses carrying health, orders, chat replies or leave days must send `Cache-Control: no-store`. | FR-04, FR-41, FR-47, FR-50 |
+| TR-29 | Quality | Responses carrying health, orders, chat replies, sign-in results or leave days must send `Cache-Control: no-store`. | FR-04, FR-41, FR-47, FR-50, FR-51 |
 | TR-30 | Quality | Each turn must allow at most 3 tool rounds, and each model call 180 output tokens, with `store: false`. | FR-04 |
-| TR-31 | Quality | The app must never write sign-in tokens, Workday credentials or leave data to its logs. | Whole app |
+| TR-31 | Quality | The app must never write sign-in tokens, session cookies, app or Workday credentials, or leave data to its logs. | Whole app |
 | TR-32 | Constraint | The app must never send leave data or sign-in data to OpenAI. | FR-47 |
 | TR-33 | Constraint | One service must serve both the API and the built Web app (design request, 27 Nov 2026). | Whole app |
 | TR-34 | Constraint | The Portal service must run in the customer's AWS account on Amazon EC2 or Amazon ECS (ZBrain platform). | Whole app |
@@ -188,21 +198,30 @@ The design leaves these out on purpose.
 
 - A second service: the design request, 27 Nov 2026, asks for one.
 - A stored copy of leave numbers: Workday holds them, and the page shows today's record (FR-52).
+- Sign-in handled in the browser: Q24 chose the server.
+- Each employee's own permission to read Workday: Q26 chose the app system account.
+- A different annual leave plan for each country or employee group: Q27 chose one plan for everyone.
 - Showing leave days to anyone but that employee: excluded by Q2 in functional-requirements.md.
 - Leave other than annual leave: excluded by Q4 in functional-requirements.md.
-- Other features on the leave days page: excluded by Q5 in functional-requirements.md.
+- Other features on the leave days page, including a sign-out control: excluded by Q5 in functional-requirements.md.
 
 ## Open questions
-No source settles these design points.
+These rows record the design questions, answered or Open.
 
 | Id | Question | Changes | Who answers | Answer | Date |
 | --- | --- | --- | --- | --- | --- |
-| Q24 | Where does the app handle the company sign-in? | Stack and templates, API contract, TR-23 | AI Developer | Open | 27 Nov 2026 |
-| Q25 | How does the app match a signed-in person to their Workday record? | Data flow, TR-24, TR-25 | AI Developer | Open | 27 Nov 2026 |
-| Q26 | How is the app allowed to read leave balances from Workday? | Integrations, Environment variables, TR-25 | AI Developer | Open | 27 Nov 2026 |
-| Q27 | How does the app know which Workday balance is annual leave? | Environment variables, TR-25 | AI Developer | Open | 27 Nov 2026 |
+| Q24 | Where does the app handle the company sign-in? | Stack and templates, API contract, TR-23 | AI Developer | On the server: the app's server signs the employee in and remembers them with a cookie. | 27 Nov 2026 |
+| Q25 | How does the app match a signed-in person to their Workday record? | Data flow, TR-24, TR-37 | AI Developer | Work email: the same work email address is in both. | 27 Nov 2026 |
+| Q26 | How is the app allowed to read leave balances from Workday? | Integrations, TR-39 | AI Developer | App system account: a Workday account for the app, limited to leave balances. | 27 Nov 2026 |
+| Q27 | How does the app know which Workday balance is annual leave? | Environment variables, TR-25 | AI Developer | One plan for everyone: one leave plan, named in the app's settings. | 27 Nov 2026 |
 | Q28 | Which time zone's date counts as today for the balance? | TR-25, FR-52 | AI Developer | Open | 27 Nov 2026 |
-| Q29 | How long does an employee stay signed in to the leave days page? | TR-23 | AI Developer | Open | 27 Nov 2026 |
+| Q29 | How long does an employee stay signed in to the leave days page? | TR-23, TR-38 | AI Developer | Open | 27 Nov 2026 |
 | Q30 | Must the app start when the sign-in or Workday settings are missing? | TR-23, TR-25 | AI Developer | Open | 27 Nov 2026 |
 | Q31 | Must the app record who looked up their leave days? | Technical requirements, FR-47 | AI Developer | Open | 27 Nov 2026 |
 | Q32 | How soon must the leave days page answer, and for how many employees? | Technical requirements | AI Developer | Open | 27 Nov 2026 |
+| Q33 | How does the app prove to Microsoft Entra ID that it is the registered app? | Environment variables, Integrations | AI Developer | Open | 27 Nov 2026 |
+| Q34 | How does the app's Workday system account sign in to Workday? | Environment variables, Integrations, TR-39 | AI Developer | Open | 27 Nov 2026 |
+| Q35 | Which Microsoft Entra ID detail counts as the work email, given that Microsoft warns these details can change? | Data flow, TR-24, TR-37 | AI Developer | Open | 27 Nov 2026 |
+| Q36 | How does a Workday account limited to leave balances find a record by work email? | Integrations, Environment variables, TR-37, TR-39 | AI Developer | Open | 27 Nov 2026 |
+| Q37 | Do people reach the deployed app at an HTTPS address, which the company sign-in requires? | Environment variables, TR-38 | AI Developer | Open | 27 Nov 2026 |
+| Q38 | Where does the server keep what it knows about a signed-in employee? | Stack and templates, Components, Environment variables | AI Developer | Open | 27 Nov 2026 |

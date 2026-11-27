@@ -18,12 +18,12 @@ flowchart LR
   visitor -->|"Reads the order list: HTTP"| web
   employee -->|"Reads their leave days left: HTTPS"| web
   employee -->|"Signs in with the company account: HTTPS"| entra
-  web -->|"Sends chat, order and leave days requests: JSON over HTTP"| api
+  web -->|"Sends chat, order, sign-in and leave days requests: JSON over HTTP"| api
   web -->|"Loads page fonts: HTTPS"| fonts
   api -->|"Asks for Nova and Sage replies: JSON over HTTPS"| openai
   api -->|"Registers, gets rules and sends audit records: JSON over HTTP"| gov
-  api -->|"Checks the company sign-in: HTTPS"| entra
-  api -->|"Reads the annual leave balance: HTTPS"| workday
+  api -->|"Completes and checks the company sign-in: HTTPS"| entra
+  api -->|"Finds the employee and reads their annual leave balance: HTTPS"| workday
 ```
 
-Container diagram of the whole portal, including the new leave days connections. Boxes are people, running parts or outside systems, and arrows show who starts each call. The box "Customer AWS account" holds the Portal service and the Web app files it serves, although the Web app runs in the browser. Nothing is grouped or left out.
+Container diagram of the whole portal, including the leave days connections. Boxes are people, running parts or outside systems, and arrows show who starts each call. The box "Customer AWS account" holds the Portal service and the Web app files it serves, although the Web app runs in the browser. Browser redirects during sign-in are left out, and nothing is grouped.
