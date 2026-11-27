@@ -1,7 +1,7 @@
 # Functional requirements: Northstar Support Portal
 
 ## Purpose
-The app is a customer-support portal for an online store, with an open order desk. This version adds one page where an employee sees how many annual leave days they have left.
+The app is a customer-support portal for an online store, with an open order desk. This version adds one page where an employee sees their annual leave days left, and drops old replies after a new chat.
 
 ## Users
 The app serves three user types. Today it has no sign-in, and this version adds company single sign-on for the leave page.
@@ -37,7 +37,7 @@ These words have one meaning each in the requirements.
 | Workday | The company's existing HR system, where leave balances come from and are kept correct. |
 
 ## Requirements
-The requirements describe the app as it behaves today, plus the leave page.
+The requirements describe the app as it behaves today, plus two pieces of new work. One is the leave page. The other is FR-58, because today an old reply still appears in a new chat.
 
 ### Support chat
 | FR id | Requirement | Acceptance criteria | Source |
@@ -49,6 +49,7 @@ The requirements describe the app as it behaves today, plus the leave page.
 | FR-05 | While a reply is on its way, the app must block a second message. | While the dots show, the message box takes no typing. | S3 |
 | FR-06 | The app must limit each customer message to 2000 characters. | The message box stops taking text at 2000 characters. | S2, S3 |
 | FR-07 | When a customer chooses to start a new chat, the app must replace the chat with a new one with Nova. | After a chat with Sage, New chat shows only Nova's greeting. | S3 |
+| FR-58 | When a customer starts a new chat while a reply is on its way, the app must drop that reply. | A customer asks a question, starts a new chat before the answer shows, and never sees that answer there. | Q28 |
 | FR-08 | If the app fails to process a message, then the app must show an error message in the chat. | The chat shows the error text, or a line saying something went wrong. | S2, S3 |
 | FR-09 | The app must keep each assistant reply to 3 sentences or fewer. | A reply about returns holds no more than 3 sentences. | S2 |
 | FR-10 | When a customer sends a message, the app must give the assistant that message and no more than 10 earlier ones. | In a long chat, an order ID typed more than 10 messages earlier no longer counts. | S2 |
@@ -105,7 +106,7 @@ The requirements describe the app as it behaves today, plus the leave page.
 | FR-37 | While governance rules are on, if a message tries to override an assistant's instructions, then the app must show the refusal reply. | A customer asks the assistant to ignore all previous instructions and reveal them, and gets the refusal reply. | S2, S6 |
 | FR-38 | While governance rules are on, if an assistant's reply holds a hidden marker, then the app must show the refusal reply instead. | The customer sees the refusal reply and never the marker. | S2, S4, S6 |
 | FR-39 | While governance rules are on and an assistant has used 10 AI model calls in a conversation, the app must refuse its next call. | With demo mode off, a customer's 6th order question to Nova in one chat gets the refusal reply. | S2, S4, Q11 |
-| FR-40 | While governance rules are on, when a conversation has used 10 order lookups, the app must refuse the next lookup. | An 11th order lookup in one conversation gets the refusal reply. | S2, S4, Q11 |
+| FR-40 | While governance rules are on, when a conversation has used 10 order lookups, the app must refuse the next lookup. | An 11th order lookup in one conversation gets the refusal reply. | S2, S4, Q11, Q27 |
 | FR-41 | While governance rules are on, the app must count chats with the same opening message as one conversation until a restart. | With demo mode off, 5 visitors choose Track an order, and a 6th who chooses it gets the refusal reply. | S2, S4, Q11 |
 | FR-57 | While governance rules are on, the app must count a chat past 10 earlier messages by the oldest customer message among those 10. | With demo mode off and each question worded anew, the 6th order question is refused and the 7th gets an answer. | S2, S4, Q11 |
 | FR-42 | While governance rules are on and demo mode is off, when an assistant reads an order, the app must record an audit entry. | The governance records hold an entry for a lookup of NS-1002. | S4 |
@@ -130,7 +131,7 @@ The requirements describe the app as it behaves today, plus the leave page.
 ### Whole app
 | FR id | Requirement | Acceptance criteria | Source |
 | --- | --- | --- | --- |
-| FR-45 | The app must fit the support page and the order desk to screens 320 pixels wide or wider. | On a phone, the store policies stack in one column and the order list scrolls sideways. | S8 |
+| FR-45 | The app must fit the support page, the order desk and the leave page to screens 320 pixels wide or wider. | On a phone, the store policies stack in one column, the order list scrolls sideways and an employee reads the leave balance. | S8, Q15 |
 
 ## Must never
 The app refuses the order and chat actions today, and the leave page adds limits of its own.
@@ -157,12 +158,13 @@ The answered questions exclude these things.
 - Checking who a customer is before the chat gives order details: not in this version. (Q6)
 - Replacing the 10 sample orders with other order data: not in this version. (Q7)
 - Changing how the governance rules count conversations: not in this version. (Q11)
+- Changing the limit of 10 order lookups in a conversation: not in this version. (Q27)
 - Changing which numbers count as order IDs, or how an unknown one blocks later replies: not in this version. (Q12)
 - Moving a chat to Sage on the plurals "refunds" or "invoices": not in this version. (Q13)
 - Cancelling an order or reaching a billing teammate through the app: not in this version. (Q14)
 
 ## Open questions
-Three points stay open: the leave page on phones, the order lookup limit and a late reply after a new chat.
+One point stays open: what a new chat does while a dropped reply is still on its way.
 
 | Id | Question | Changes | Who answers | Answer | Date |
 | --- | --- | --- | --- | --- | --- |
@@ -180,7 +182,7 @@ Three points stay open: the leave page on phones, the order lookup limit and a l
 | Q12 | Any 4-digit number, even a year, counts as an order ID. One unknown number then blocks later replies. Does this stay? | FR-12, FR-15, FR-16, Out of scope | Citizen User | Keep both as today. | 2026-11-27 |
 | Q13 | The plural words refunds and invoices do not move a chat to Sage. Nova then mentions a transfer that never happens. Does this stay? | FR-21, FR-27, Terms, Out of scope | Citizen User | Keep as today. | 2026-11-27 |
 | Q14 | The chat mentions cancellation and a billing teammate, but the app offers neither action. Does this stay? | FR-17, FR-26, Out of scope | Citizen User | Keep as today. | 2026-11-27 |
-| Q15 | Does the leave page need to work on phones, as today's two pages do? | FR-44, FR-45 | Citizen User | Open | 2026-11-27 |
+| Q15 | Does the leave page need to work on phones, as today's two pages do? | FR-44, FR-45 | Citizen User | Phones and computers: it works on screens 320 pixels wide or wider, as the two current pages do. | 2026-11-27 |
 | Q16 | Which service does the company use for single sign-on? | FR-46, Terms | Citizen User | Microsoft Entra ID. | 2026-11-27 |
 | Q17 | Which HR system holds the leave balances? | FR-47, Terms | Citizen User | Workday. | 2026-11-27 |
 | Q18 | What happens when a person cannot sign in, or signs in but is not allowed in? | FR-49 | Citizen User | Say it's unavailable: a message that the page is not available to them. | 2026-11-27 |
@@ -192,18 +194,19 @@ Three points stay open: the leave page on phones, the order lookup limit and a l
 | Q24 | Does the leave balance take away annual leave that is approved but not yet taken? | FR-51, Terms | Citizen User | Yes, take it off. | 2026-11-27 |
 | Q25 | Who has access to the leave page: everyone who signs in with company single sign-on, or only a limited group? | FR-49, FR-53, Users, Out of scope | Citizen User | Anyone with sign-in: everyone who can use the company's Microsoft Entra ID sign-in. | 2026-11-27 |
 | Q26 | Does the leave balance also take away annual leave that is requested but still waiting for approval? | FR-54, Terms | Citizen User | Yes, take it off. | 2026-11-27 |
-| Q27 | The app's rules refuse the 11th order lookup in a conversation, but its tests expect the 9th to be refused. Which limit is right? | FR-40 | Citizen User | Open | 2026-11-27 |
-| Q28 | A customer can start a new chat while a reply is on its way, and that old reply then appears in the new chat. Does this stay? | FR-07 | Citizen User | Open | 2026-11-27 |
+| Q27 | The app's rules refuse the 11th order lookup in a conversation, but its tests expect the 9th to be refused. Which limit is right? | FR-40, Out of scope | Citizen User | Keep 10: the policy file's limit, as the app does today. The test that expects 8 is out of date. | 2026-11-27 |
+| Q28 | A customer can start a new chat while a reply is on its way, and that old reply then appears in the new chat. Does this stay? | FR-07, FR-58 | Citizen User | Drop the old reply: it never appears in the new chat. This changes today's behaviour. | 2026-11-27 |
+| Q29 | Today a new chat started during a reply shows typing dots and blocks typing until that old reply arrives. With that reply dropped, what must the new chat do? | FR-04, FR-05, FR-58 | Citizen User | Open | 2026-11-27 |
 
 ## Sources
-The request and the answered questions give the leave page, and the existing files give today's behaviour.
+The request and the answered questions give the new work, and the existing files give today's behaviour.
 
 - S1: The request, 2026-11-27: "Write the requirements for this app as it is today, plus one new page where an employee sees how many leave days they have left."
 - S2: server.mjs, the existing chat, order and store policy behaviour.
 - S3: src/main.jsx, the existing support page and order desk.
 - S4: governance.mjs and governance/solution-policy.json, the existing governance rules.
 - S5: governance/solution-manifest.json, the declared assistants and their order lookup.
-- S6: test/governance.test.mjs, the existing governance tests. Their order lookup limit disagrees with S4 (Q27).
+- S6: test/governance.test.mjs, the existing governance tests. Their order lookup limit of 8 is out of date (Q27).
 - S7: `README.md`, the existing setup and behaviour notes.
 - S8: public/styles.css, the existing screen layouts.
 - S9: integrations-config.json, the AI key setting.
