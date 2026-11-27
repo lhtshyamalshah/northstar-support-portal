@@ -3,7 +3,7 @@
     {
       "name": "backend",
       "cwd": ".",
-      "install": "npm install",
+      "install": "npm install --install-links",
       "build": "npm run build",
       "test": "npm test",
       "start": "node server.mjs",

@@ -197,11 +197,11 @@ describe("usage counters", () => {
     assert.equal(decision.action, "allow");
   });
 
-  it("denies the ninth order lookup in one conversation", async () => {
+  it("denies the eleventh order lookup in one conversation", async () => {
     const session = newSession("support");
     await session.agentStart("Check NS-1001 repeatedly");
 
-    for (let index = 0; index < 8; index += 1) {
+    for (let index = 0; index < 10; index += 1) {
       await session.beforeTool(ORDER_LOOKUP_TOOL_DID, { order_id: "NS-1001" });
     }
 

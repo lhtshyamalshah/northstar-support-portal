@@ -20,6 +20,74 @@
     }
   },
   {
+    "name": "Microsoft Entra ID",
+    "description": "Company sign-in for the leave days page. Optional: without it the rest of the portal works.",
+    "logo": "https://icon.horse/icon/microsoft.com",
+    "configuration": {
+      "ENTRA_TENANT_ID": {
+        "description": "Directory (tenant) ID of the company, not a domain name",
+        "type": "TEXT",
+        "label": "Tenant ID",
+        "required": false
+      },
+      "ENTRA_CLIENT_ID": {
+        "description": "Application (client) ID of the app registration, which must send the upn claim",
+        "type": "TEXT",
+        "label": "Client ID",
+        "required": false
+      },
+      "ENTRA_CLIENT_SECRET": {
+        "description": "Client secret of the app registration; renew it before it expires",
+        "type": "PASSWORD",
+        "label": "Client Secret",
+        "required": false
+      },
+      "ENTRA_REDIRECT_URI": {
+        "description": "Public https address of /api/auth/callback, exactly as registered",
+        "type": "TEXT",
+        "label": "Redirect URI",
+        "required": false
+      }
+    }
+  },
+  {
+    "name": "Workday",
+    "description": "Annual leave days left, read from a custom report. Optional: without it the rest of the portal works.",
+    "logo": "https://icon.horse/icon/workday.com",
+    "configuration": {
+      "WORKDAY_TOKEN_URL": {
+        "description": "https address that issues Workday access tokens",
+        "type": "TEXT",
+        "label": "Token URL",
+        "required": false
+      },
+      "WORKDAY_CLIENT_ID": {
+        "description": "Client ID of the app's API client in Workday",
+        "type": "TEXT",
+        "label": "Client ID",
+        "required": false
+      },
+      "WORKDAY_CLIENT_SECRET": {
+        "description": "Secret of that API client",
+        "type": "PASSWORD",
+        "label": "Client Secret",
+        "required": false
+      },
+      "WORKDAY_REFRESH_TOKEN": {
+        "description": "Refresh token of the app's system account, limited to leave balances",
+        "type": "PASSWORD",
+        "label": "Refresh Token",
+        "required": false
+      },
+      "WORKDAY_REPORT_URL": {
+        "description": "https address of the annual leave balance report (takes workEmail and asOfDate, returns daysLeft)",
+        "type": "TEXT",
+        "label": "Report URL",
+        "required": false
+      }
+    }
+  },
+  {
     "name": "ZBrain Governance",
     "description": "Enterprise policy and Governance SDK authentication",
     "logo": "https://icon.horse/icon/zbrain.ai",

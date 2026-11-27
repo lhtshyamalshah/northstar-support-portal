@@ -101,11 +101,21 @@ tbody tr:hover { background: #fbfcf8; }
 .status::before { width: 5px; height: 5px; border-radius: 50%; background: currentColor; content: ""; }
 .status-processing { color: #95651d; background: #fff3dd; }.status-shipped { color: #416e98; background: #e7f1fa; }.status-delivered { color: #397148; background: #e7f5e9; }.status-refunded { color: #95555d; background: #f9e8e8; }
 
+.leave-shell { display: grid; place-items: center; width: min(100% - 48px, 1180px); min-height: 100vh; margin: 0 auto; }
+.leave-card { width: min(100%, 460px); padding: 48px 32px; border: 1px solid var(--line); border-radius: 4px; background: var(--card); box-shadow: 0 15px 40px rgba(32, 46, 39, .055); text-align: center; }
+.leave-card h1 { font-size: 30px; line-height: 1.2; letter-spacing: -1px; }
+.leave-card p { margin: 24px 0 0; color: var(--muted); font-size: 15px; line-height: 1.55; }
+.leave-card .leave-number { color: var(--sage); font: 700 76px/1 "Playfair Display", Georgia, serif; overflow-wrap: anywhere; }
+
 @media (max-width: 650px) {
   .support-shell, .admin-shell { width: min(100% - 28px, 1180px); }
   .topbar { height: 76px; }
   .wordmark { font-size: 25px; }
-  nav { gap: 15px; font-size: 12px; }
+  nav { flex-wrap: wrap; justify-content: flex-end; gap: 6px 15px; font-size: 12px; }
+  nav a { white-space: nowrap; }
+  .leave-shell { width: min(100% - 28px, 1180px); }
+  .leave-card { padding: 36px 18px; }
+  .leave-card h1 { font-size: 26px; letter-spacing: -.5px; }
   .hero { padding: 57px 0 34px; }
   h1 { letter-spacing: -3px; }
   .hero-copy { font-size: 15px; }

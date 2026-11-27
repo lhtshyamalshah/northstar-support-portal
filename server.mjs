@@ -3,6 +3,7 @@ import { join } from "node:path";
 import process from "node:process";
 import express from "express";
 import OpenAI from "openai";
+import { createLeaveRouter } from "./leave.mjs";
 
 loadEnvFile();
 
@@ -343,7 +344,10 @@ function localReply(message, orderId, agent) {
 
 app.use(express.json({ limit: "100kb" }));
 
-app.get("/api/orders", (_request, response) => {
+// Sign-in and leave days. Chat and orders stay open; leave data never reaches OpenAI.
+app.use(createLeaveRouter({ env: process.env }));
+
+app.get("/api/orders",(_request, response) => {
   response.set("Cache-Control", "no-store").json({ orders });
 });
 

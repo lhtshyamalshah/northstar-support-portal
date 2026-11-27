@@ -1,5 +1,6 @@
 import { StrictMode, useEffect, useRef, useState } from "react";
 import { createRoot } from "react-dom/client";
+import LeavePage from "./LeavePage.jsx";
 
 const initialMessage = {
   role: "assistant",
@@ -18,7 +19,7 @@ function Header({ admin = false }) {
     <header className={`topbar ${admin ? "admin-topbar" : ""}`}>
       <a className="wordmark" href="/" aria-label="Northstar support home">Northstar<span>®</span></a>
       <nav aria-label="Primary navigation">
-        {admin ? <a href="/">Support <span aria-hidden="true">↗</span></a> : <><a href="#policies">Support center</a><a href="/admin">Order desk <span aria-hidden="true">↗</span></a></>}
+        {admin ? <a href="/">Support <span aria-hidden="true">↗</span></a> : <><a href="#policies">Support center</a><a href="/leave">Leave days</a><a href="/admin">Order desk <span aria-hidden="true">↗</span></a></>}
       </nav>
     </header>
   );
@@ -178,6 +179,8 @@ function AdminPage() {
   );
 }
 
-const admin = window.location.pathname === "/admin";
+const path = window.location.pathname;
+const admin = path === "/admin";
 document.body.className = admin ? "admin-body" : "";
-createRoot(document.querySelector("#root")).render(<StrictMode>{admin ? <AdminPage /> : <SupportPage />}</StrictMode>);
+const page = path === "/leave" ? <LeavePage /> : admin ? <AdminPage /> : <SupportPage />;
+createRoot(document.querySelector("#root")).render(<StrictMode>{page}</StrictMode>);
