@@ -119,25 +119,25 @@ When: the employee wants to know how many leave days they have left.
 Done when: the employee has seen their leave balance.
 
 1. Employee opens the leave page at its own address. (FR-48)
-2. Employee signs in with company single sign-on. (FR-46)
-3. The app takes the employee's leave balance from the HR system. (FR-47)
-4. The app shows the employee their leave balance. (FR-44)
+2. Employee signs in with company single sign-on through Microsoft Entra ID. (FR-46)
+3. The app takes the employee's leave balance from Workday. (FR-47)
+4. The app shows the employee their leave balance as one total. (FR-44)
 5. Employee reads the leave balance.
 
 If things go differently:
 - 2a. The employee cannot sign in: see open question Q18 in functional-requirements.md.
-- 3a. The HR system holds no balance for the employee: see open question Q19 in functional-requirements.md.
-- 3b. The app cannot reach the HR system: see open question Q20 in functional-requirements.md.
+- 3a. Workday holds no balance for the employee: see open question Q19 in functional-requirements.md.
+- 3b. The app cannot reach Workday: see open question Q20 in functional-requirements.md.
 
 ```mermaid
 flowchart TD
-  s1["Step 1: Employee opens the leave page at its own address."] --> s2["Step 2: Employee signs in with company single sign-on."]
-  s2 --> s3["Step 3: The app takes the employee's leave balance from the HR system."]
-  s3 --> s4["Step 4: The app shows the employee their leave balance."]
+  s1["Step 1: Employee opens the leave page at its own address."] --> s2["Step 2: Employee signs in with company single sign-on through Microsoft Entra ID."]
+  s2 --> s3["Step 3: The app takes the employee's leave balance from Workday."]
+  s3 --> s4["Step 4: The app shows the employee their leave balance as one total."]
   s4 --> s5["Step 5: Employee reads the leave balance."]
   s2 -.-> x2a["Step 2a: The employee cannot sign in"]
-  s3 -.-> x3a["Step 3a: The HR system holds no balance for the employee"]
-  s3 -.-> x3b["Step 3b: The app cannot reach the HR system"]
+  s3 -.-> x3a["Step 3a: Workday holds no balance for the employee"]
+  s3 -.-> x3b["Step 3b: The app cannot reach Workday"]
 ```
 
 ## Requirements not in any journey

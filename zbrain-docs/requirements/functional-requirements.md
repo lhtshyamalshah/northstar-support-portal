@@ -32,9 +32,9 @@ These words have one meaning each in the requirements.
 | Hidden marker | A secret text placed in the assistants' instructions to detect leaks. |
 | Conversation | What the governance rules count against. Today it is identified by its opening message. |
 | Leave page | The new page where an employee sees their leave balance. |
-| Leave balance | The number of leave days an employee has left. |
-| Company single sign-on | The company's sign-in, which tells the app which employee is looking at the leave page. |
-| HR system | The company's existing HR system, where leave balances come from and are kept correct. |
+| Leave balance | The number of leave days an employee has left, shown as one total. |
+| Company single sign-on | The company's sign-in through Microsoft Entra ID, which tells the app which employee is looking at the leave page. |
+| Workday | The company's existing HR system, where leave balances come from and are kept correct. |
 
 ## Requirements
 The requirements describe the app as it behaves today, plus the leave page.
@@ -113,9 +113,9 @@ The requirements describe the app as it behaves today, plus the leave page.
 ### Leave days
 | FR id | Requirement | Acceptance criteria | Source |
 | --- | --- | --- | --- |
-| FR-44 | When an employee opens the leave page, the app must show that employee's leave balance. | A signed-in employee opens the leave page and sees the number of leave days they have left. | S1, Q3 |
-| FR-46 | When an employee opens the leave page, the app must identify that employee through company single sign-on. | An employee signs in with company single sign-on, and the leave page treats them as that employee. | Q1 |
-| FR-47 | The app must take each leave balance from the HR system. | The number on the leave page matches the number the HR system holds for that employee. | Q2 |
+| FR-44 | When an employee opens the leave page, the app must show that employee's leave balance as one total. | A signed-in employee opens the leave page and sees one total number of leave days left. | S1, Q3, Q8 |
+| FR-46 | When an employee opens the leave page, the app must identify that employee through company single sign-on with Microsoft Entra ID. | An employee signs in through Microsoft Entra ID, and the leave page treats them as that employee. | Q1, Q16 |
+| FR-47 | The app must take each leave balance from Workday. | The total on the leave page agrees with what Workday holds for that employee. | Q2, Q17 |
 | FR-48 | The app must provide the leave page at its own address on the same site as the support page. | An employee enters the leave page's address on the site and reaches the leave page. | Q4 |
 
 ### Whole app
@@ -135,10 +135,12 @@ The app refuses the order and chat actions today, and the leave page adds limits
 - The app must never link to or mention the leave page on the support page or the order desk. (Q4)
 
 ## Out of scope
-The answers about leave balances exclude two things.
+The answers about leave exclude these things.
 
 - Keeping or correcting leave balances in this app: not in this version. (Q2)
 - A manager or HR staff view of another employee's leave balance: not in this version. (Q3)
+- A breakdown of the leave balance by kind of leave: not in this version. (Q8)
+- Requesting leave, and anything else about leave beyond seeing the days left: not in this version. (Q10)
 
 ## Open questions
 The leave page has open points, and parts of today's behaviour need a keep or change decision.
@@ -152,21 +154,22 @@ The leave page has open points, and parts of today's behaviour need a keep or ch
 | Q5 | Who is the order desk for, and does it stay open to anyone? Today the support page links to it. | FR-30, FR-31, FR-35, Users | Citizen User | Open | 2026-11-27 |
 | Q6 | Today anyone who types an order ID gets that order's details, including the customer name and total. Does this stay? | FR-13, Must never | Citizen User | Open | 2026-11-27 |
 | Q7 | The orders are 10 fixed samples built into the app. Does this version keep them? | FR-31, FR-36 | Citizen User | Open | 2026-11-27 |
-| Q8 | What does the leave page show, and for which types of leave? | FR-44 | Citizen User | Open | 2026-11-27 |
+| Q8 | What does the leave page show, and for which types of leave? | FR-44, Terms, Out of scope | Citizen User | One total. | 2026-11-27 |
 | Q9 | Do Nova or Sage answer questions about leave? | FR-44, Support chat | Citizen User | Open | 2026-11-27 |
-| Q10 | Is anything else about leave wanted in this version, beyond seeing the days left? | Leave days, Out of scope | Citizen User | Open | 2026-11-27 |
+| Q10 | Is anything else about leave wanted in this version, beyond seeing the days left? | Leave days, Out of scope | Citizen User | Nothing else. | 2026-11-27 |
 | Q11 | Chats with the same opening message share governance limits, so later visitors are refused. Long chats start a new count. Does this stay? | FR-39, FR-40, FR-41 | Citizen User | Open | 2026-11-27 |
 | Q12 | Any 4-digit number, even a year, counts as an order ID. One unknown number then blocks later replies. Does this stay? | FR-12, FR-15, FR-16 | Citizen User | Open | 2026-11-27 |
 | Q13 | The plural words refunds and invoices do not move a chat to Sage. Nova then mentions a transfer that never happens. Does this stay? | FR-21, FR-27, Terms | Citizen User | Open | 2026-11-27 |
 | Q14 | The chat mentions cancellation and a billing teammate, but the app offers neither action. Does this stay? | FR-17, FR-26 | Citizen User | Open | 2026-11-27 |
 | Q15 | Does the leave page need to work on phones, as today's two pages do? | FR-44, FR-45 | Citizen User | Open | 2026-11-27 |
-| Q16 | Which service does the company use for single sign-on? | FR-46 | Citizen User | Open | 2026-11-27 |
-| Q17 | Which HR system holds the leave balances? | FR-47, Terms | Citizen User | Open | 2026-11-27 |
+| Q16 | Which service does the company use for single sign-on? | FR-46, Terms | Citizen User | Microsoft Entra ID. | 2026-11-27 |
+| Q17 | Which HR system holds the leave balances? | FR-47, Terms | Citizen User | Workday. | 2026-11-27 |
 | Q18 | What happens when a person cannot sign in, or signs in but is not allowed in? | FR-46 | Citizen User | Open | 2026-11-27 |
-| Q19 | What happens when the HR system has no record or balance for a signed-in employee? | FR-44, FR-47 | Citizen User | Open | 2026-11-27 |
-| Q20 | What happens when the app cannot reach the HR system? | FR-44, FR-47 | Citizen User | Open | 2026-11-27 |
+| Q19 | What happens when Workday has no record or balance for a signed-in employee? | FR-44, FR-47 | Citizen User | Open | 2026-11-27 |
+| Q20 | What happens when the app cannot reach Workday? | FR-44, FR-47 | Citizen User | Open | 2026-11-27 |
 | Q21 | How up to date must the shown leave balance be? | FR-47 | Citizen User | Open | 2026-11-27 |
-| Q22 | What does the leave page do before company single sign-on and the HR system are connected? | FR-46, FR-47 | Citizen User | Open | 2026-11-27 |
+| Q22 | What does the leave page do before Microsoft Entra ID and Workday are connected? | FR-46, FR-47 | Citizen User | Open | 2026-11-27 |
+| Q23 | Which kinds of leave in Workday count toward the one total on the leave page? | FR-44, FR-47, Terms | Citizen User | Open | 2026-11-27 |
 
 ## Sources
 The request and the answered questions give the leave page, and the existing files give today's behaviour.
