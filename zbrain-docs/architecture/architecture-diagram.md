@@ -23,7 +23,7 @@ flowchart LR
   api -->|"Asks for Nova and Sage replies: JSON over HTTPS"| openai
   api -->|"Registers, gets rules and sends audit records: JSON over HTTP"| gov
   api -->|"Completes and checks the company sign-in: HTTPS"| entra
-  api -->|"Finds the employee and reads their annual leave balance: HTTPS"| workday
+  api -->|"Gets a token and reads the annual leave report: HTTPS"| workday
 ```
 
 Container diagram of the whole portal, including the leave days connections. Boxes are people, running parts or outside systems, and arrows show who starts each call. The box "Customer AWS account" holds the Portal service and the Web app files it serves, although the Web app runs in the browser. Browser redirects during sign-in are left out, and nothing is grouped.
