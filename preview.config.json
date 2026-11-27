@@ -5,7 +5,7 @@
       "role": "backend",
       "prerequisites": [
         "node scripts/build-sdk.mjs",
-        "npm install"
+        "npm install --install-links"
       ],
       "command": "node server.mjs",
       "cwd": ".",
@@ -15,7 +15,7 @@
       "name": "frontend",
       "role": "frontend",
       "prerequisites": [
-        "npm install"
+        "npm install --install-links"
       ],
       "command": "npm run dev:client",
       "cwd": ".",

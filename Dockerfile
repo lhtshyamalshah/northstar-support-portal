@@ -3,14 +3,15 @@
 FROM node:22-alpine AS build
 WORKDIR /app
 
-COPY package.json package-lock.json .npmrc ./
+COPY package.json package-lock.json ./
 COPY package/ ./package/
 COPY scripts/ ./scripts/
 
 # The governance SDK is a local file: dependency; its dist/ must exist before the
-# root install packs it.
+# root install packs it. The lockfile packs (rather than links) that dependency,
+# so every root install needs --install-links.
 RUN node scripts/build-sdk.mjs \
- && npm install --no-audit --no-fund
+ && npm install --install-links --no-audit --no-fund
 
 COPY . .
 RUN npm run build
