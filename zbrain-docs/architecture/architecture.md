@@ -14,9 +14,9 @@ The app keeps its own stack and starts from no new template.
 | AI governance | Existing ZBrain Governance SDK in `package/` | It carries the governance rules (FR-34 to FR-40). | Removing it: those requirements lose their cover. | Startup depends on the ZBrain Governance service. |
 | Data storage | Process memory, no database | Sample orders reset on restart (FR-48), and Workday holds leave (FR-52). | A database: no requirement keeps data across restarts. | Each running copy has its own orders, chat counts and sessions. |
 | Company sign-in | Microsoft Entra ID, handled by the Portal service with `@azure/msal-node` and a client secret | The requester named Entra ID (FR-51). Q24 and Q33 settle the rest. | Sign-in code written by hand: the app would own every protocol check. A certificate: Q33 chose a client secret. | One new library. Someone must renew the client secret before it expires. |
-| Work email | The sign-in name, from the `upn` claim of the Entra ID token | Q35 chose it to find the employee in Workday (FR-47). | `preferred_username`: Microsoft says it can be a phone number or generic name. | Microsoft says the name can change. Q39 asks the company to confirm the match. |
+| Work email | The sign-in name, from the `upn` claim of the Entra ID token | Q35 chose it, and Q39 confirms the match (FR-47). | `preferred_username`: Microsoft says it can be a phone number or generic name. | Microsoft says the name can change, so the app relies on the company's confirmation. |
 | Sign-in sessions | Portal service memory for 8 hours, with a random session identifier in a cookie | Q29 and Q38 chose this (FR-51). | A shared session store: Q38 chose memory. `express-session`: its own memory store is not built for production. | A restart signs everyone out, and it suits one running copy. |
-| HR system | Workday, read on each request through a dedicated report, with token access | The requester named it (FR-52). Q26, Q34 and Q36 settle the access. | Searching employee records through the Workday API: Q36 chose the report. A password: Q34 chose tokens. | The account reaches other employees' balances. The page depends on a report kept in Workday. |
+| HR system | Workday, read on each request through a dedicated report, with token access | The requester named it (FR-52). Q26, Q34, Q36 and Q40 settle the access. | Searching employee records through the Workday API: Q36 chose the report. A password: Q34 chose tokens. | The account reaches other employees' balances. The page depends on a report not yet built (Q41). |
 
 ## Workspace layout
 The app stays at the repository root, with one new server module and no new folder.
@@ -66,7 +66,6 @@ The platform supplies these at run time, and the entries marked New serve the le
 | `WORKDAY_CLIENT_SECRET` | New: secret of that API client | Yes | none |
 | `WORKDAY_REFRESH_TOKEN` | New: refresh token of the app's system account | Yes | none |
 | `WORKDAY_REPORT_URL` | New: address of the dedicated leave balance report | No | none |
-| `WORKDAY_ANNUAL_LEAVE_PLAN` | New: names the one annual leave plan; Q40 settles how the report uses it | No | none |
 
 ## Components
 Two components run the app, and in development Vite passes `/api` calls on.
@@ -108,10 +107,12 @@ These flows cover the journeys that call an outside system.
 5. Portal service keeps the sign-in name in an 8-hour session, sets the cookie and returns the browser to `/leave`.
 6. Web app asks the Portal service for the leave days again.
 7. Portal service gets a Workday access token with the system account's refresh token.
-8. Portal service asks the Workday report for the balance, giving the sign-in name as the work email (Q28 settles the date).
+8. Portal service asks the Workday report for the balance, giving the sign-in name as the work email.
 9. Portal service returns the number unchanged, and the Web app shows it.
 
-The report returns one balance for each Workday record with that work email. A report with no balance, or more than one, gets the employee no number. Q39 to Q41 are Open on the sign-in name match and the report's setup.
+The balance is as of the local date where the employee is (Q28). The report is not built yet and will use the field names the app expects (Q41). It picks the annual leave plan itself (Q40).
+
+The report must return one balance for each Workday record with that work email. A report with no balance, or more than one, gets the employee no number. Q42 and Q43 are Open on the field names and on how the app learns the date.
 
 Three questions in functional-requirements.md are Open, so this design gives their cases no behaviour. They are Q6 (no leave number), Q19 (sign-in or Workday unavailable) and Q23 (a person who cannot sign in).
 
@@ -123,7 +124,7 @@ The app calls these outside systems.
 | OpenAI | Gets Nova's and Sage's replies through the Responses API | Out from the Portal service | API key | FR-04, FR-09, FR-33 |
 | ZBrain Governance service | Registers the app, gets policy rules, sends audit and violation records | Out from the Portal service | Bearer API key | FR-34, FR-39, FR-40 |
 | Microsoft Entra ID | Signs employees in and supplies their sign-in name | Browser redirect, and out from the Portal service | Company account for employees; client secret for the app | FR-51 |
-| Workday | Runs a dedicated report that takes a work email and returns only the annual leave balance | Out from the Portal service, read only | OAuth 2.0 refresh token of the app's system account, limited to leave balances | FR-47, FR-52 |
+| Workday | Runs a new dedicated report that takes a work email and returns only the annual leave balance | Out from the Portal service, read only | OAuth 2.0 refresh token of the app's system account, limited to leave balances | FR-47, FR-52 |
 | Google Fonts | Loads the page fonts, as index.html does today | Out from the Web app | None | Whole app |
 
 ## API contract
@@ -137,7 +138,7 @@ Callers send no sign-in, except on `GET /api/leave-days`, which needs the sessio
 | `POST /api/chat` | Web app | Answer a chat message | `message`, `history`, `activeAgent` | 200 `agent`, `handoff`, `reply`, `source`; 400 blank message; 500 `error` | FR-04, FR-07, FR-15, FR-26 |
 | `GET /api/auth/sign-in` | Web app | Start the company sign-in | None | 302 to Microsoft Entra ID | FR-51 |
 | `GET /api/auth/callback` | Web app | Receive the sign-in result and start the session | `code`, `state` | 302 to `/leave` with the session cookie | FR-51 |
-| `GET /api/leave-days` | Web app | Return the signed-in employee's leave days left | No fields: the session names the employee | 200 `daysLeft`; 401 no valid session | FR-47, FR-51, FR-52 |
+| `GET /api/leave-days` | Web app | Return the signed-in employee's leave days left | The session names the employee. Q43 decides whether the request carries date or time zone details. | 200 `daysLeft`; 401 no valid session | FR-47, FR-51, FR-52 |
 
 Q6, Q19 and Q23 in functional-requirements.md decide the failure outcomes of the sign-in routes and `GET /api/leave-days`.
 
@@ -185,7 +186,7 @@ Each technical requirement (TR) covers today's app or the leave days page. Where
 | TR-22 | Feature | The Web app must show every visitor of the support page a link to `/leave`. | FR-53 |
 | TR-23 | Feature | The Portal service must start a session only after validating a sign-in from the company's Microsoft Entra ID tenant. | FR-47, FR-51 |
 | TR-24 | Feature | The Portal service must take the work email only from the validated sign-in name, never from request input. | FR-47, FR-51 |
-| TR-25 | Feature | The Portal service must read today's balance of the configured annual leave plan from Workday and return it unchanged. | FR-47, FR-52 |
+| TR-25 | Feature | The Portal service must return unchanged the Workday annual leave balance as of the local date where the employee is. | FR-47, FR-52 |
 | TR-26 | Feature | The leave days page must offer nothing besides the leave days left. | FR-47 |
 | TR-27 | Feature | The Portal service must require the company sign-in for leave days only, leaving chat and orders open. | FR-42, FR-51 |
 | TR-37 | Feature | The Portal service must return a number only when the Workday report returns exactly one balance for the work email. | FR-47, FR-52 |
@@ -193,7 +194,7 @@ Each technical requirement (TR) covers today's app or the leave days page. Where
 | TR-39 | Feature | The Portal service must call Workday only as the app's system account, with token access. | FR-47, FR-52 |
 | TR-40 | Feature | The Portal service must keep sign-in sessions only in process memory, and end each one 8 hours after sign-in. | FR-47, FR-51 |
 | TR-41 | Feature | The Portal service must prove its identity to Microsoft Entra ID with a client secret. | FR-51 |
-| TR-42 | Feature | The Portal service must read leave only through the dedicated Workday report, which returns only the annual leave balance. | FR-47, FR-52 |
+| TR-42 | Feature | The Portal service must read leave only through the dedicated Workday report, and send it no leave plan name. | FR-47, FR-52 |
 | TR-28 | Quality | The Portal service must read Workday on every leave days request and never store the number. | FR-52 |
 | TR-29 | Quality | Responses carrying health, orders, chat replies, sign-in results or leave days must send `Cache-Control: no-store`. | FR-04, FR-41, FR-47, FR-50, FR-51 |
 | TR-30 | Quality | Each turn must allow at most 3 tool rounds, and each model call 180 output tokens, with `store: false`. | FR-04 |
@@ -203,6 +204,7 @@ Each technical requirement (TR) covers today's app or the leave days page. Where
 | TR-34 | Constraint | The Portal service must run in the customer's AWS account on Amazon EC2 or Amazon ECS (ZBrain platform). | Whole app |
 | TR-35 | Constraint | New settings must come from the environment and appear in `.env.example`, `integrations-config.json` and `docker-compose.yml`. | Whole app |
 | TR-36 | Constraint | The Dockerfile must copy every new server module into the runtime image. | Whole app |
+| TR-43 | Constraint | The new Workday report must pick the annual leave plan itself and use the field names the Portal service expects. | FR-47, FR-52 |
 
 ## Non-goals
 The design leaves these out on purpose.
@@ -225,8 +227,8 @@ These rows record the design questions, answered or Open.
 | Q24 | Where does the app handle the company sign-in? | Stack and templates, API contract, TR-23 | AI Developer | On the server: the app's server signs the employee in and remembers them with a cookie. | 27 Nov 2026 |
 | Q25 | How does the app match a signed-in person to their Workday record? | Data flow, TR-24, TR-37 | AI Developer | Work email: the same work email address is in both. | 27 Nov 2026 |
 | Q26 | How is the app allowed to read leave balances from Workday? | Integrations, TR-39 | AI Developer | App system account: a Workday account for the app, limited to leave balances. | 27 Nov 2026 |
-| Q27 | How does the app know which Workday balance is annual leave? | Environment variables, TR-25 | AI Developer | One plan for everyone: one leave plan, named in the app's settings. | 27 Nov 2026 |
-| Q28 | Which time zone's date counts as today for the balance? | TR-25, FR-52 | AI Developer | Open | 27 Nov 2026 |
+| Q27 | How does the app know which Workday balance is annual leave? | Environment variables, TR-25 | AI Developer | One plan for everyone: one leave plan, named in the app's settings. Q40 later moved the plan choice into the report. | 27 Nov 2026 |
+| Q28 | Which time zone's date counts as today for the balance? | Data flow, TR-25, FR-52 | AI Developer | Employee's date: the local date where the employee is. | 27 Nov 2026 |
 | Q29 | How long does an employee stay signed in to the leave days page? | Stack and templates, Data flow, TR-40 | AI Developer | 8 hours. | 27 Nov 2026 |
 | Q30 | Must the app start when the sign-in or Workday settings are missing? | TR-23, TR-25 | AI Developer | Open | 27 Nov 2026 |
 | Q31 | Must the app record who looked up their leave days? | Technical requirements, FR-47 | AI Developer | Open | 27 Nov 2026 |
@@ -237,6 +239,8 @@ These rows record the design questions, answered or Open.
 | Q36 | How does a Workday account limited to leave balances find a record by work email? | Integrations, Environment variables, TR-37, TR-42 | AI Developer | Dedicated report: a Workday report takes the email and returns only the annual leave balance. | 27 Nov 2026 |
 | Q37 | Do people reach the deployed app at an HTTPS address, which the company sign-in requires? | Environment variables, TR-38 | AI Developer | Open | 27 Nov 2026 |
 | Q38 | Where does the server keep what it knows about a signed-in employee? | Stack and templates, Components, TR-40 | AI Developer | In memory: kept on the server. A restart signs everyone out, which suits one running copy. | 27 Nov 2026 |
-| Q39 | Has the company confirmed that each sign-in name matches that employee's Workday work email, and never passes to someone else? | Data flow, TR-24, TR-37 | AI Developer | Open | 27 Nov 2026 |
-| Q40 | The Workday report takes only the email. Does the report itself pick the annual leave plan, or must the app send the plan name? | Environment variables, TR-25, TR-42 | AI Developer | Open | 27 Nov 2026 |
-| Q41 | Does the Workday report already exist, with its own names for the email input and the balance? | Integrations, Environment variables, TR-42 | AI Developer | Open | 27 Nov 2026 |
+| Q39 | Has the company confirmed that each sign-in name matches that employee's Workday work email, and never passes to someone else? | Stack and templates, TR-24, TR-37 | AI Developer | Both confirmed: each sign-in name matches the Workday work email and never passes to someone else. | 27 Nov 2026 |
+| Q40 | The Workday report takes only the email. Does the report itself pick the annual leave plan, or must the app send the plan name? | Environment variables, TR-25, TR-42, TR-43 | AI Developer | Report decides: the report itself returns only the annual leave plan. | 27 Nov 2026 |
+| Q41 | Does the Workday report already exist, with its own names for the email input and the balance? | Integrations, Data flow, TR-43 | AI Developer | Not yet: it will be built to match the field names the app expects. | 27 Nov 2026 |
+| Q42 | Which names must the new Workday report use for the work email, the date and the days left? | Data flow, Integrations, TR-43 | AI Developer | Open | 27 Nov 2026 |
+| Q43 | How does the app learn the local date where the employee is? | Data flow, API contract, TR-25 | AI Developer | Open | 27 Nov 2026 |
