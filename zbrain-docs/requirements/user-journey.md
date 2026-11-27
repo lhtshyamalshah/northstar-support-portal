@@ -11,7 +11,7 @@ Each row is one goal for one user type.
 | Customer | Check a store policy | FR-01 to FR-03, FR-18 to FR-20 |
 | Customer | Get billing help | FR-13, FR-21 to FR-27 |
 | Order desk visitor | Review the orders | FR-30 to FR-35 |
-| Employee | Check annual leave days left | FR-44, FR-46 to FR-52 |
+| Employee | Check annual leave days left | FR-44, FR-46 to FR-56 |
 
 ## Customer: get an answer about an order
 When: the customer wants to know where an order stands.
@@ -119,28 +119,26 @@ When: the employee wants to know how many annual leave days they have left.
 Done when: the employee has seen their leave balance.
 
 1. Employee opens the leave page at its own address. (FR-48)
-2. Employee signs in with company single sign-on through Microsoft Entra ID. (FR-46)
+2. Employee signs in with company single sign-on through Microsoft Entra ID. (FR-46, FR-53)
 3. The app takes what Workday holds at this visit for the employee's leave balance. (FR-47, FR-50)
-4. The app shows one total of annual leave days, with approved leave not yet taken off. (FR-44, FR-51)
+4. The app shows one total of annual leave days, with approved and waiting leave taken off. (FR-44, FR-51, FR-54)
 5. Employee reads the leave balance.
 
 If things go differently:
-- 1a. The app lacks a connection to Microsoft Entra ID or Workday: the app says the leave page is not set up yet; journey ends. (FR-52)
+- 1a. The app has no set-up connection to Microsoft Entra ID or Workday: the app says the leave page is not set up yet; journey ends. (FR-52)
 - 2a. The employee cannot sign in: the app says the leave page is not available to them; journey ends. (FR-49)
-- 2b. The employee signs in without access to the leave page: the app says it is not available to them; journey ends. (FR-49)
-- 3a. Workday holds no balance for the employee: see open question Q19 in functional-requirements.md.
-- 3b. The app cannot reach Workday: see open question Q20 in functional-requirements.md.
+- 3a. Workday has no leave record or balance for the employee: the app says it found no balance; journey ends. (FR-55)
+- 3b. The app cannot reach Workday: the app says it cannot show the leave balance right now; journey ends. (FR-56)
 
 ```mermaid
 flowchart TD
   s1["Step 1: Employee opens the leave page at its own address."] --> s2["Step 2: Employee signs in with company single sign-on through Microsoft Entra ID."]
   s2 --> s3["Step 3: The app takes what Workday holds at this visit for the employee's leave balance."]
-  s3 --> s4["Step 4: The app shows one total of annual leave days, with approved leave not yet taken off."]
+  s3 --> s4["Step 4: The app shows one total of annual leave days, with approved and waiting leave taken off."]
   s4 --> s5["Step 5: Employee reads the leave balance."]
-  s1 -.-> x1a["Step 1a: The app lacks a connection to Microsoft Entra ID or Workday"]
+  s1 -.-> x1a["Step 1a: The app has no set-up connection to Microsoft Entra ID or Workday"]
   s2 -.-> x2a["Step 2a: The employee cannot sign in"]
-  s2 -.-> x2b["Step 2b: The employee signs in without access to the leave page"]
-  s3 -.-> x3a["Step 3a: Workday holds no balance for the employee"]
+  s3 -.-> x3a["Step 3a: Workday has no leave record or balance for the employee"]
   s3 -.-> x3b["Step 3b: The app cannot reach Workday"]
 ```
 

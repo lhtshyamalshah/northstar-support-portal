@@ -10,7 +10,7 @@ The app serves three user types. Today it has no sign-in, and this version adds 
 | --- | --- |
 | Customer | Asks Nova or Sage about orders, shipping, returns, cancellations and billing. |
 | Order desk visitor | Reads the list of orders on the order desk, which anyone is able to open. |
-| Employee | Signs in with company single sign-on and sees their own leave balance. |
+| Employee | Signs in with company single sign-on, which opens the leave page to everyone who has it, and sees their own leave balance. |
 
 ## Terms
 These words have one meaning each in the requirements.
@@ -32,7 +32,7 @@ These words have one meaning each in the requirements.
 | Hidden marker | A secret text placed in the assistants' instructions to detect leaks. |
 | Conversation | What the governance rules count against. Today it is identified by its opening message. |
 | Leave page | The new page where an employee sees their leave balance. |
-| Leave balance | The number of annual leave days an employee has left, as one total. Approved annual leave not yet taken counts as used. |
+| Leave balance | One total of annual leave days left. Approved leave not yet taken, and requests waiting for approval, count as used. |
 | Company single sign-on | The company's sign-in through Microsoft Entra ID, which tells the app which employee is looking at the leave page. |
 | Workday | The company's existing HR system, where leave balances come from and are kept correct. |
 
@@ -117,10 +117,14 @@ The requirements describe the app as it behaves today, plus the leave page.
 | FR-46 | When an employee opens the leave page, the app must identify that employee through company single sign-on with Microsoft Entra ID. | An employee signs in through Microsoft Entra ID, and the leave page treats them as that employee. | Q1, Q16 |
 | FR-47 | The app must take each leave balance from Workday. | The total on the leave page comes from the annual leave Workday holds for that employee. | Q2, Q17, Q23 |
 | FR-48 | The app must provide the leave page at its own address on the same site as the support page. | An employee enters the leave page's address on the site and reaches the leave page. | Q4 |
-| FR-49 | If a person cannot sign in, or signs in without access to the leave page, then the app must say it is unavailable to them. | A person whose sign-in fails reads that the leave page is not available to them. | Q18 |
+| FR-49 | If a person cannot sign in through company single sign-on, then the app must say the leave page is unavailable to them. | A person whose sign-in fails reads that the leave page is not available to them. | Q18, Q25 |
 | FR-50 | When an employee opens the leave page, the app must use what Workday holds at that visit for the leave balance. | After annual leave changes in Workday, the employee's next visit shows a total that includes the change. | Q21 |
 | FR-51 | The app must take approved annual leave that the employee has not yet taken off the leave balance. | After approval of annual leave for a later date, the employee's total is lower by those days. | Q24 |
-| FR-52 | While the app lacks a connection to Microsoft Entra ID or Workday, the app must say the leave page is not set up yet. | Before both connections exist, a person who opens the leave page reads that it is not set up yet. | Q22 |
+| FR-52 | While the app has no set-up connection to Microsoft Entra ID or Workday, the app must say the leave page is not set up yet. | Before both connections exist, a person who opens the leave page reads that it is not set up yet. | Q22 |
+| FR-53 | The app must open the leave page to everyone who signs in with company single sign-on. | A person who signs in through Microsoft Entra ID reaches the leave page without belonging to a special group. | Q25 |
+| FR-54 | The app must take annual leave that is requested and waiting for approval off the leave balance. | While an annual leave request waits for approval, the employee's total is lower by those days. | Q26 |
+| FR-55 | If Workday has no leave record or balance for a signed-in employee, then the app must say it found no balance. | An employee with no leave record in Workday reads that no balance was found. | Q19 |
+| FR-56 | If the app cannot reach Workday through a set-up connection, then the app must say it cannot show the leave balance right now. | While Workday does not answer, a signed-in employee reads that the balance cannot be shown right now. | Q20 |
 
 ### Whole app
 | FR id | Requirement | Acceptance criteria | Source |
@@ -145,6 +149,7 @@ The answered questions exclude these things.
 - A manager or HR staff view of another employee's leave balance: not in this version. (Q3)
 - A breakdown of the leave balance by kind of leave: not in this version. (Q8)
 - Counting any kind of leave other than annual leave in the leave balance: not in this version. (Q23)
+- Limiting the leave page to a selected group of people who can sign in: not in this version. (Q25)
 - Requesting leave, and anything else about leave beyond seeing the days left: not in this version. (Q10)
 - Nova or Sage answering questions about leave: not in this version, because only the leave page shows the leave balance. (Q9, Q10)
 - Signing in to open the order desk: not in this version. (Q5)
@@ -152,7 +157,7 @@ The answered questions exclude these things.
 - Replacing the 10 sample orders with other order data: not in this version. (Q7)
 
 ## Open questions
-The leave page has open points, and parts of today's behaviour need a keep or change decision.
+Parts of today's behaviour need a keep or change decision, and the leave page has one open point about phones.
 
 | Id | Question | Changes | Who answers | Answer | Date |
 | --- | --- | --- | --- | --- | --- |
@@ -174,14 +179,14 @@ The leave page has open points, and parts of today's behaviour need a keep or ch
 | Q16 | Which service does the company use for single sign-on? | FR-46, Terms | Citizen User | Microsoft Entra ID. | 2026-11-27 |
 | Q17 | Which HR system holds the leave balances? | FR-47, Terms | Citizen User | Workday. | 2026-11-27 |
 | Q18 | What happens when a person cannot sign in, or signs in but is not allowed in? | FR-49 | Citizen User | Say it's unavailable: a message that the page is not available to them. | 2026-11-27 |
-| Q19 | What happens when Workday has no record or balance for a signed-in employee? | FR-44, FR-47 | Citizen User | Open | 2026-11-27 |
-| Q20 | What happens when the app cannot reach Workday? | FR-44, FR-47 | Citizen User | Open | 2026-11-27 |
+| Q19 | What happens when Workday has no record or balance for a signed-in employee? | FR-55 | Citizen User | No balance found: a message saying no balance was found. | 2026-11-27 |
+| Q20 | What happens when the app cannot reach Workday? | FR-56 | Citizen User | Can't show right now: a message that the balance cannot be shown right now. | 2026-11-27 |
 | Q21 | How up to date must the shown leave balance be? | FR-50 | Citizen User | Current on each visit. | 2026-11-27 |
 | Q22 | What does the leave page do before Microsoft Entra ID and Workday are connected? | FR-52 | Citizen User | Say not set up yet. | 2026-11-27 |
 | Q23 | Which kinds of leave in Workday count toward the one total on the leave page? | FR-44, FR-47, Terms, Out of scope | Citizen User | Annual leave only. | 2026-11-27 |
 | Q24 | Does the leave balance take away annual leave that is approved but not yet taken? | FR-51, Terms | Citizen User | Yes, take it off. | 2026-11-27 |
-| Q25 | Who has access to the leave page: everyone who signs in with company single sign-on, or only a limited group? | FR-49, Users | Citizen User | Open | 2026-11-27 |
-| Q26 | Does the leave balance also take away annual leave that is requested but still waiting for approval? | FR-51, Terms | Citizen User | Open | 2026-11-27 |
+| Q25 | Who has access to the leave page: everyone who signs in with company single sign-on, or only a limited group? | FR-49, FR-53, Users, Out of scope | Citizen User | Anyone with sign-in: everyone who can use the company's Microsoft Entra ID sign-in. | 2026-11-27 |
+| Q26 | Does the leave balance also take away annual leave that is requested but still waiting for approval? | FR-54, Terms | Citizen User | Yes, take it off. | 2026-11-27 |
 
 ## Sources
 The request and the answered questions give the leave page, and the existing files give today's behaviour.
