@@ -1,7 +1,7 @@
 # Functional requirements: Northstar Support Portal
 
 ## Purpose
-Customers of the Northstar online store get support on orders, shipping, returns, cancellations and billing, and visitors read an order list (S3, S7). This change adds one page where "an employee sees how many leave days they have left" (S1).
+Customers of the Northstar online store get support on orders, shipping, returns, cancellations and billing, and visitors read an order list (S3, S7). On one page, "an employee sees how many leave days they have left" (S1, S10).
 
 ## Users
 The sources name three kinds of user.
@@ -29,11 +29,12 @@ These words have one meaning in all the documents.
 | Hidden marker | A secret code inside an assistant's instructions that reveals a leak of those instructions. |
 | Chat count | The tally kept for all chats with the same opening message, until the app restarts. A chat with over 10 earlier messages counts under a later message. |
 | Leave days left | The annual leave days the HR system records as remaining today for an employee, in the calendar year January to December. |
+| Unavailable message | The text "Your leave days can’t be shown right now.", shown on the leave days page with no number. |
 | Company sign-in | The company's sign-in, Microsoft Entra ID, which tells the app which employee is looking. |
 | HR system | Workday, the company's existing system, which keeps one annual leave balance for each employee, in days. |
 
 ## Requirements
-Each area below states what the app does today, except Leave days, which is new.
+Each area below states what the app does today.
 
 ### Support chat
 | FR id | Requirement | Acceptance criteria | Source |
@@ -110,12 +111,23 @@ Each area below states what the app does today, except Leave days, which is new.
 | FR-46 | The app must link the support page and the order desk to each other. | A visitor chooses Order desk on the support page, then Support on the order desk. | S2 |
 
 ### Leave days
+The leave days page is in the app, but nobody has tested it with a real company sign-in or HR system report (S7, S11).
+
 | FR id | Requirement | Acceptance criteria | Source |
 | --- | --- | --- | --- |
-| FR-47 | When an employee opens the new leave days page, the app must show that employee's annual leave days left for the current calendar year. | An employee reads their own number, which counts annual leave only, from January to December. | S1, Q2, Q4 |
-| FR-51 | When an employee opens the leave days page, the app must identify the employee through the company sign-in. | An employee has signed in with their Microsoft Entra ID account before they read a number. | Q1, Q7, Q16 |
-| FR-52 | The app must show the leave days left exactly as the HR system records them as remaining today. | An employee reads one number of days, which matches today's remaining annual leave in their Workday record. | Q3, Q17, Q18, Q20, Q21, Q22 |
-| FR-53 | The app must show a link to the leave days page on the support page. | A person who has not signed in sees the link on the support page. | Q7 |
+| FR-47 | When an employee opens the leave days page, the app must show that employee's annual leave days left for the current calendar year. | An employee reads their own number, which counts annual leave only, from January to December. | S1, S10, Q2, Q4 |
+| FR-51 | When an employee opens the leave days page, the app must identify the employee through the company sign-in. | An employee has signed in with their Microsoft Entra ID account before they read a number. | S10, Q1, Q7, Q16 |
+| FR-52 | The app must show the leave days left exactly as the HR system records them as remaining today. | An employee reads one number of days, which matches today's remaining annual leave in their Workday record. | S10, Q3, Q17, Q18, Q20, Q21, Q22 |
+| FR-53 | The app must show a link to the leave days page on the support page. | A person who has not signed in sees the link on the support page. | S2, Q7 |
+| FR-54 | While the app is fetching the leave days left, the app must show that it is loading. | An employee reads "Loading…" before the number appears. | S10 |
+| FR-55 | While the leave days page shows a number, the app must show nothing else except the page title. | An employee reads "Annual leave days left" and the number, with no menu, link or button. | S10, Q5 |
+| FR-56 | The app must take today to be the date where the employee is. | An employee for whom it is already 28 November gets the balance as of 28 November. | S10, S11, Q21 |
+| FR-57 | If the HR system does not give exactly one leave balance for an employee, then the app must show the unavailable message. | An employee with no annual leave balance in Workday reads the unavailable message. | S7, S10 |
+| FR-58 | If the app cannot read the HR system, then the app must show the unavailable message. | During a Workday outage, a signed-in employee reads the unavailable message. | S7, S10 |
+| FR-59 | If the company sign-in does not identify the person, then the app must show the unavailable message. | A person who cancels the company sign-in and returns to the app reads the unavailable message. | S7, S10 |
+| FR-60 | While the company sign-in or HR system connection settings are missing, the app must still start. | With no HR system settings, a customer opens the support page and chats. | S7, S10 |
+| FR-61 | When 8 hours have passed since an employee signed in, the app must require the company sign-in again. | An employee who signed in at 09:00 and opens the page at 17:00 goes through the company sign-in again. | S7, S10, S11 |
+| FR-62 | When the app restarts, the app must require every employee to sign in again. | After a restart, a signed-in employee who opens the page goes through the company sign-in again. | S7, S10, S11 |
 
 ### Whole app
 | FR id | Requirement | Acceptance criteria | Source |
@@ -133,7 +145,8 @@ Each line names an action a tester tries and sees refused.
 - The app must never show a customer a reply that contains a hidden marker. (S4, S6)
 - The app must never write a customer's message text into its log of governance decisions. (S4, S6)
 - The app must never show an employee's leave days left to anyone but that employee. (Q2)
-- The app must never open the leave days page to a person without a company sign-in. (Q7)
+- The app must never show leave days left to a person without a company sign-in. (Q7)
+- The app must never write an employee's name, email or leave days into its log of leave sign-ins and lookups. (S7, S10)
 
 ## Out of scope
 The requester's answers exclude these three things.
@@ -152,7 +165,7 @@ These rows record answered questions, points with no source, and behaviour today
 | Q3 | Where do the leave numbers come from? | FR-52, Terms | Requester | Existing HR system. | 27 Nov 2026 |
 | Q4 | Which leave does the number count, and over which leave year? | FR-47, Terms, Out of scope | Requester | Annual leave only, over the calendar year January to December. | 27 Nov 2026 |
 | Q5 | What does the leave days page offer besides the days left? | FR-47, Out of scope | Requester | Nothing else. | 27 Nov 2026 |
-| Q6 | What does an employee see when the app has no leave number for them? | FR-47 | Requester | Open. Asked in chat, and the requester chose no option. | 27 Nov 2026 |
+| Q6 | What does an employee see when the app has no leave number for them? | FR-47, FR-57 | Requester | Settled by today's app, as the requester chose no option: the unavailable message (S10). | 27 Nov 2026 |
 | Q7 | How do employees reach the new page, given that customers use the same app? | FR-51, FR-53, Must never | Requester | Link on support page: anyone sees the link, but the page needs company sign-in. | 27 Nov 2026 |
 | Q8 | The order desk shows customer names and totals to anyone, and the support page links to it. Who is it for? | FR-41, FR-42, FR-46, Users | Requester | Open. Asked in chat, and the requester chose no option. | 27 Nov 2026 |
 | Q9 | Anyone who types an order ID gets its details, and Track an order names sample order NS-1002. Is that intended? | FR-03, FR-16 | Requester | Open. Asked in chat, and the requester chose no option. | 27 Nov 2026 |
@@ -165,11 +178,13 @@ These rows record answered questions, points with no source, and behaviour today
 | Q16 | Which company sign-in service do employees use? | FR-51, Terms | Requester | Microsoft Entra ID. | 27 Nov 2026 |
 | Q17 | Which HR system holds the leave records? | FR-52, Terms | Requester | Workday. | 27 Nov 2026 |
 | Q18 | Does the page show the HR system's days left as recorded, or must the app work them out? | FR-47, FR-52, Terms | Requester | HR system's number: show exactly what it records as remaining. | 27 Nov 2026 |
-| Q19 | What does an employee see when the company sign-in or the HR system is unavailable? | FR-47, FR-51, FR-52 | Requester | Open. Asked in chat, and the requester chose no option. | 27 Nov 2026 |
+| Q19 | What does an employee see when the company sign-in or the HR system is unavailable? | FR-58, FR-59 | Requester | Settled by today's app, as the requester chose no option: the unavailable message, once the person is back in the app (S10). | 27 Nov 2026 |
 | Q20 | Workday keeps a time off balance in days or in hours. What must the page show if annual leave is in hours? | FR-52, Terms | Requester | Kept in days: annual leave is already in days, so hours do not arise. | 27 Nov 2026 |
 | Q21 | Workday gives a balance as of a chosen date. Which date's remaining number must the page show? | FR-52, Terms | Requester | Today. | 27 Nov 2026 |
 | Q22 | What must the page show if Workday holds more than one annual leave balance for an employee? | FR-52, Terms | Requester | Only ever one: each employee has a single annual leave balance. | 27 Nov 2026 |
-| Q23 | Anyone sees the leave days link. What does a person see who cannot complete the company sign-in? | FR-51, FR-53 | Requester | Open. Asked in chat, and the requester chose no option. | 27 Nov 2026 |
+| Q23 | Anyone sees the leave days link. What does a person see who cannot complete the company sign-in? | FR-53, FR-59 | Requester | Settled by today's app, as the requester chose no option: the unavailable message, if the sign-in returns them to the app (S10). | 27 Nov 2026 |
+| Q46 | The leave days page named in the request is already in the app. Is any further page or change wanted? | Purpose, Requirements | Requester | Open | 27 Nov 2026 |
+| Q47 | An employee stays signed in for 8 hours and cannot sign out, so others using that computer can see the number. Keep this? | FR-55, FR-61, Must never, Out of scope | Requester | Open | 27 Nov 2026 |
 
 ## Sources
 - S1: The request, 27 Nov 2026: "Write the requirements for this app as it is today, plus one new page where an employee sees how many leave days they have left."
@@ -181,3 +196,5 @@ These rows record answered questions, points with no source, and behaviour today
 - S7: The project's readme file, read 27 Nov 2026.
 - S8: The older descriptions arch.md and agents-plan.md, read 27 Nov 2026.
 - S9: The included governance package's audit records: package/zbrain-governance-sdk/src/core/index.ts, read 27 Nov 2026.
+- S10: The existing app's leave days page and sign-in: leave.mjs and src/LeavePage.jsx, read 27 Nov 2026.
+- S11: The earlier approved technical design, architecture.md: the AI Developer's answers there on dates, sign-in and the HR report, 27 Nov 2026.

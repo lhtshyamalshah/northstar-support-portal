@@ -11,7 +11,7 @@ Each user type has at least one journey.
 | Customer | Learn a store rule | FR-01, FR-04, FR-12, FR-14, FR-21, FR-22, FR-24, FR-25, FR-32 |
 | Customer | Get billing help | FR-10, FR-13, FR-23, FR-26, FR-27, FR-28, FR-29, FR-30, FR-31, FR-32 |
 | Order desk visitor | Review the orders | FR-41, FR-42, FR-43, FR-44, FR-45, FR-46 |
-| Employee | See leave days left | FR-47, FR-51, FR-52, FR-53 |
+| Employee | See leave days left | FR-47, FR-51, FR-52, FR-53, FR-54, FR-55, FR-56, FR-57, FR-58, FR-59 |
 
 ## Customer: check on an order
 When: a customer wants news of an order.
@@ -139,26 +139,26 @@ flowchart TD
 When: an employee wants to know their remaining annual leave.
 Done when: the employee has read their leave days left.
 
-1. Employee opens the leave days page from the support page. (FR-47, FR-53)
+1. Employee opens the leave days page from the support page. (FR-53)
 2. The app identifies the employee through the company sign-in. (FR-51)
-3. The app shows the leave days left that the HR system records as remaining today. (FR-47, FR-52)
-4. Employee reads the number of leave days left.
+3. The app says that it is loading the leave days left. (FR-54)
+4. The app shows the leave days left that the HR system records as remaining today. (FR-47, FR-52, FR-56)
+5. Employee reads the number of leave days left. (FR-55)
 
 If things go differently:
-- 2a. The company sign-in is unavailable: see open question Q19 in functional-requirements.md.
-- 2b. The person cannot complete the company sign-in: see open question Q23 in functional-requirements.md.
-- 3a. The HR system is unavailable: see open question Q19 in functional-requirements.md.
-- 3b. The HR system has no leave number for the employee: see open question Q6 in functional-requirements.md.
+- 2a. The company sign-in does not identify the person: the app shows the unavailable message; journey ends. (FR-59)
+- 3a. The app cannot read the HR system: the app shows the unavailable message; journey ends. (FR-58)
+- 3b. The HR system does not give exactly one balance: the app shows the unavailable message; journey ends. (FR-57)
 
 ```mermaid
 flowchart TD
   s1["Step 1: Employee opens the leave days page from the support page"] --> s2["Step 2: The app identifies the employee through the company sign-in"]
-  s2 --> s3["Step 3: The app shows the leave days left that the HR system records as remaining today"]
-  s3 --> s4["Step 4: Employee reads the number of leave days left"]
-  s2 -.-> x2a["Step 2a: The company sign-in is unavailable"]
-  s2 -.-> x2b["Step 2b: The person cannot complete the company sign-in"]
-  s3 -.-> x3a["Step 3a: The HR system is unavailable"]
-  s3 -.-> x3b["Step 3b: The HR system has no leave number for the employee"]
+  s2 --> s3["Step 3: The app says that it is loading the leave days left"]
+  s3 --> s4["Step 4: The app shows the leave days left that the HR system records as remaining today"]
+  s4 --> s5["Step 5: Employee reads the number of leave days left"]
+  s2 -.-> x2a["Step 2a: The company sign-in does not identify the person"]
+  s3 -.-> x3a["Step 3a: The app cannot read the HR system"]
+  s3 -.-> x3b["Step 3b: The HR system does not give exactly one balance"]
 ```
 
 ## Requirements not in any journey
@@ -171,3 +171,6 @@ These requirements apply outside a single task.
 - FR-48: applies when the app restarts.
 - FR-49: applies to the whole app.
 - FR-50: applies to the whole app.
+- FR-60: applies when the app starts.
+- FR-61: applies to an employee's later visits.
+- FR-62: applies when the app restarts.
