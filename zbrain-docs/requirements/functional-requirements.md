@@ -10,7 +10,7 @@ The sources name three kinds of user.
 | --- | --- |
 | Customer | Chats with the assistants on orders, store rules and billing. |
 | Order desk visitor | Reads the list of orders without signing in. |
-| Employee | Sees how many leave days they have left. |
+| Employee | Signs in with the company sign-in and sees their own leave days left. |
 
 ## Terms
 These words have one meaning in all the documents.
@@ -28,7 +28,9 @@ These words have one meaning in all the documents.
 | Refusal message | The reply that declines a request and asks for an order, shipping, returns, cancellation or billing question. |
 | Hidden marker | A secret code inside an assistant's instructions that reveals a leak of those instructions. |
 | Chat count | The tally kept for all chats with the same opening message, until the app restarts. A chat with over 10 earlier messages counts under a later message. |
-| Leave days left | The number of leave days an employee still has. |
+| Leave days left | The number of annual leave days an employee still has in the calendar year, January to December. |
+| Company sign-in | The company's sign-in, which tells the app which employee is looking. |
+| HR system | The company's existing system that the leave numbers come from. |
 
 ## Requirements
 Each area below states what the app does today, except Leave days, which is new.
@@ -110,7 +112,9 @@ Each area below states what the app does today, except Leave days, which is new.
 ### Leave days
 | FR id | Requirement | Acceptance criteria | Source |
 | --- | --- | --- | --- |
-| FR-47 | When an employee opens the new leave days page, the app must show how many leave days that employee has left. | An employee opens the page and reads their own number of leave days left. | S1 |
+| FR-47 | When an employee opens the new leave days page, the app must show that employee's annual leave days left for the current calendar year. | An employee reads their own number, which counts annual leave only, from January to December. | S1, Q2, Q4 |
+| FR-51 | When an employee opens the leave days page, the app must identify the employee through the company sign-in. | An employee has signed in with the company sign-in before they read a number. | Q1 |
+| FR-52 | The app must get the leave numbers from the existing HR system. | The number an employee reads is based on their own leave record in the HR system. | Q3 |
 
 ### Whole app
 | FR id | Requirement | Acceptance criteria | Source |
@@ -127,19 +131,23 @@ Each line names an action a tester tries and sees refused.
 - The app must never describe an order whose ID matches no order. (S3, S7)
 - The app must never show a customer a reply that contains a hidden marker. (S4, S6)
 - The app must never write a customer's message text into its log of governance decisions. (S4, S6)
+- The app must never show an employee's leave days left to anyone but that employee. (Q2)
 
 ## Out of scope
-None, because nobody has excluded anything yet.
+The requester's answers exclude these two things.
+
+- Anyone but the employee seeing that employee's leave days left: not in this version. (Q2)
+- Leave other than annual leave in the leave days left: not in this version. (Q4)
 
 ## Open questions
-These points have no source, or today's behaviour looks unintended.
+These rows record answered questions, points with no source, and behaviour today that looks unintended.
 
 | Id | Question | Changes | Who answers | Answer | Date |
 | --- | --- | --- | --- | --- | --- |
-| Q1 | How does the app know which employee is looking at the leave days page? | FR-47, Users | Requester | Open | 27 Nov 2026 |
-| Q2 | Who besides the employee is allowed to see an employee's leave days left? | FR-47, Users, Must never | Requester | Open | 27 Nov 2026 |
-| Q3 | Where do the leave numbers come from? | FR-47 | Requester | Open | 27 Nov 2026 |
-| Q4 | Which leave does the number count, and over which leave year? | FR-47, Terms | Requester | Open | 27 Nov 2026 |
+| Q1 | How does the app know which employee is looking at the leave days page? | FR-51, Users, Terms | Requester | Company sign-in. | 27 Nov 2026 |
+| Q2 | Who besides the employee is allowed to see an employee's leave days left? | FR-47, Must never, Out of scope | Requester | Only that employee. | 27 Nov 2026 |
+| Q3 | Where do the leave numbers come from? | FR-52, Terms | Requester | Existing HR system. | 27 Nov 2026 |
+| Q4 | Which leave does the number count, and over which leave year? | FR-47, Terms, Out of scope | Requester | Annual leave only, over the calendar year January to December. | 27 Nov 2026 |
 | Q5 | What does the leave days page offer besides the days left? | FR-47, Out of scope | Requester | Open | 27 Nov 2026 |
 | Q6 | What does an employee see when the app has no leave number for them? | FR-47 | Requester | Open | 27 Nov 2026 |
 | Q7 | How do employees reach the new page, given that customers use the same app? | FR-46, FR-47 | Requester | Open | 27 Nov 2026 |
@@ -151,6 +159,10 @@ These points have no source, or today's behaviour looks unintended.
 | Q13 | Sage mentions a billing teammate, but the app offers no way to reach one. Keep that wording? | FR-30 | Requester | Open | 27 Nov 2026 |
 | Q14 | The support page note says shipping takes 3 to 5 days, while replies say business days. Which is right? | FR-21, FR-24 | Requester | Open | 27 Nov 2026 |
 | Q15 | When the app itself fails, the chat shows the internal error text to the customer. Keep that? | FR-15 | Requester | Open | 27 Nov 2026 |
+| Q16 | Which company sign-in service do employees use? | FR-51, Terms | Requester | Open | 27 Nov 2026 |
+| Q17 | Which HR system holds the leave records? | FR-52, Terms | Requester | Open | 27 Nov 2026 |
+| Q18 | Does the page show the HR system's days left as recorded, or must the app work them out? | FR-47, FR-52, Terms | Requester | Open | 27 Nov 2026 |
+| Q19 | What does an employee see when the company sign-in or the HR system is unavailable? | FR-47, FR-51, FR-52 | Requester | Open | 27 Nov 2026 |
 
 ## Sources
 - S1: The request, 27 Nov 2026: "Write the requirements for this app as it is today, plus one new page where an employee sees how many leave days they have left."
