@@ -11,7 +11,7 @@ Each row is one goal for one user type.
 | Customer | Check a store policy | FR-01 to FR-03, FR-18 to FR-20 |
 | Customer | Get billing help | FR-13, FR-21 to FR-27 |
 | Order desk visitor | Review the orders | FR-30 to FR-35 |
-| Employee | Check leave days left | FR-44 |
+| Employee | Check leave days left | FR-44, FR-46 to FR-48 |
 
 ## Customer: get an answer about an order
 When: the customer wants to know where an order stands.
@@ -116,22 +116,28 @@ flowchart TD
 
 ## Employee: check leave days left
 When: the employee wants to know how many leave days they have left.
-Done when: the employee has seen the number.
+Done when: the employee has seen their leave balance.
 
-1. Employee opens the leave page. (FR-44)
-2. The app shows how many leave days the employee has left. (FR-44)
-3. Employee reads the number.
+1. Employee opens the leave page at its own address. (FR-48)
+2. Employee signs in with company single sign-on. (FR-46)
+3. The app takes the employee's leave balance from the HR system. (FR-47)
+4. The app shows the employee their leave balance. (FR-44)
+5. Employee reads the leave balance.
 
 If things go differently:
-- 1a. The app does not know which employee this is: see open question Q1 in functional-requirements.md.
-- 2a. The app has no balance for the employee: see open question Q2 in functional-requirements.md.
+- 2a. The employee cannot sign in: see open question Q18 in functional-requirements.md.
+- 3a. The HR system holds no balance for the employee: see open question Q19 in functional-requirements.md.
+- 3b. The app cannot reach the HR system: see open question Q20 in functional-requirements.md.
 
 ```mermaid
 flowchart TD
-  s1["Step 1: Employee opens the leave page."] --> s2["Step 2: The app shows how many leave days the employee has left."]
-  s2 --> s3["Step 3: Employee reads the number."]
-  s1 -.-> x1a["Step 1a: The app does not know which employee this is"]
-  s2 -.-> x2a["Step 2a: The app has no balance for the employee"]
+  s1["Step 1: Employee opens the leave page at its own address."] --> s2["Step 2: Employee signs in with company single sign-on."]
+  s2 --> s3["Step 3: The app takes the employee's leave balance from the HR system."]
+  s3 --> s4["Step 4: The app shows the employee their leave balance."]
+  s4 --> s5["Step 5: Employee reads the leave balance."]
+  s2 -.-> x2a["Step 2a: The employee cannot sign in"]
+  s3 -.-> x3a["Step 3a: The HR system holds no balance for the employee"]
+  s3 -.-> x3b["Step 3b: The app cannot reach the HR system"]
 ```
 
 ## Requirements not in any journey

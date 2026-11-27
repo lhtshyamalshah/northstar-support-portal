@@ -4,13 +4,13 @@
 The app is a customer-support portal for an online store, with an open order desk. This version adds one page where an employee sees how many leave days they have left.
 
 ## Users
-The app serves three user types, and the app as it is today has no sign-in.
+The app serves three user types. Today it has no sign-in, and this version adds company single sign-on for the leave page.
 
 | User type | What they do in the app |
 | --- | --- |
 | Customer | Asks Nova or Sage about orders, shipping, returns, cancellations and billing. |
 | Order desk visitor | Reads the list of orders on the order desk, which anyone is able to open. |
-| Employee | Sees how many leave days they have left. |
+| Employee | Signs in with company single sign-on and sees their own leave balance. |
 
 ## Terms
 These words have one meaning each in the requirements.
@@ -31,7 +31,10 @@ These words have one meaning each in the requirements.
 | Refusal reply | The reply that declines a request and asks about an order, shipping, returns, cancellations or billing. |
 | Hidden marker | A secret text placed in the assistants' instructions to detect leaks. |
 | Conversation | What the governance rules count against. Today it is identified by its opening message. |
-| Leave page | The new page where an employee sees their leave days left. |
+| Leave page | The new page where an employee sees their leave balance. |
+| Leave balance | The number of leave days an employee has left. |
+| Company single sign-on | The company's sign-in, which tells the app which employee is looking at the leave page. |
+| HR system | The company's existing HR system, where leave balances come from and are kept correct. |
 
 ## Requirements
 The requirements describe the app as it behaves today, plus the leave page.
@@ -110,7 +113,10 @@ The requirements describe the app as it behaves today, plus the leave page.
 ### Leave days
 | FR id | Requirement | Acceptance criteria | Source |
 | --- | --- | --- | --- |
-| FR-44 | When an employee opens the leave page, the app must show how many leave days that employee has left. | An employee opens the leave page and sees their number of leave days left. | S1 |
+| FR-44 | When an employee opens the leave page, the app must show that employee's leave balance. | A signed-in employee opens the leave page and sees the number of leave days they have left. | S1, Q3 |
+| FR-46 | When an employee opens the leave page, the app must identify that employee through company single sign-on. | An employee signs in with company single sign-on, and the leave page treats them as that employee. | Q1 |
+| FR-47 | The app must take each leave balance from the HR system. | The number on the leave page matches the number the HR system holds for that employee. | Q2 |
+| FR-48 | The app must provide the leave page at its own address on the same site as the support page. | An employee enters the leave page's address on the site and reaches the leave page. | Q4 |
 
 ### Whole app
 | FR id | Requirement | Acceptance criteria | Source |
@@ -118,26 +124,31 @@ The requirements describe the app as it behaves today, plus the leave page.
 | FR-45 | The app must fit the support page and the order desk to screens 320 pixels wide or wider. | On a phone, the store policies stack in one column and the order list scrolls sideways. | S8 |
 
 ## Must never
-These actions are refused today.
+The app refuses the order and chat actions today, and the leave page adds limits of its own.
 
 - The app must never describe an order that does not exist. (S2)
 - The app must never give a chat the details of an order whose ID the customer has not typed in it. (S2)
 - The app must never make up payment details, charge amounts, invoice availability or refund dates. (S2)
 - The app must never let a chat change, cancel or refund an order. (S2, S5)
 - The app must never write chat message text to its governance decision log. (S4, S6)
+- The app must never show an employee's leave balance to anyone but that employee. (Q3)
+- The app must never link to or mention the leave page on the support page or the order desk. (Q4)
 
 ## Out of scope
-None, because nobody has excluded anything from this version yet.
+The answers about leave balances exclude two things.
+
+- Keeping or correcting leave balances in this app: not in this version. (Q2)
+- A manager or HR staff view of another employee's leave balance: not in this version. (Q3)
 
 ## Open questions
 The leave page has open points, and parts of today's behaviour need a keep or change decision.
 
 | Id | Question | Changes | Who answers | Answer | Date |
 | --- | --- | --- | --- | --- | --- |
-| Q1 | How does the app know which employee is looking at the leave page? The app has no accounts today. | FR-44, Users | Citizen User | Open | 2026-11-27 |
-| Q2 | Where do leave balances come from, and who keeps them correct? The app holds no leave data today. | FR-44 | Citizen User | Open | 2026-11-27 |
-| Q3 | Who is allowed to see an employee's leave balance? | FR-44, Must never | Citizen User | Open | 2026-11-27 |
-| Q4 | Where does the leave page sit, given that the rest of the site is open to customers? | FR-44, FR-35 | Citizen User | Open | 2026-11-27 |
+| Q1 | How does the app know which employee is looking at the leave page? The app has no accounts today. | FR-46, Users | Citizen User | Company single sign-on. | 2026-11-27 |
+| Q2 | Where do leave balances come from, and who keeps them correct? The app holds no leave data today. | FR-47, Terms, Out of scope | Citizen User | Existing HR system. | 2026-11-27 |
+| Q3 | Who is allowed to see an employee's leave balance? | FR-44, Must never, Out of scope | Citizen User | Only that employee. | 2026-11-27 |
+| Q4 | Where does the leave page sit, given that the rest of the site is open to customers? | FR-48, Must never | Citizen User | Same site, no link: reached by its own address, and customer pages do not mention it. | 2026-11-27 |
 | Q5 | Who is the order desk for, and does it stay open to anyone? Today the support page links to it. | FR-30, FR-31, FR-35, Users | Citizen User | Open | 2026-11-27 |
 | Q6 | Today anyone who types an order ID gets that order's details, including the customer name and total. Does this stay? | FR-13, Must never | Citizen User | Open | 2026-11-27 |
 | Q7 | The orders are 10 fixed samples built into the app. Does this version keep them? | FR-31, FR-36 | Citizen User | Open | 2026-11-27 |
@@ -149,9 +160,16 @@ The leave page has open points, and parts of today's behaviour need a keep or ch
 | Q13 | The plural words refunds and invoices do not move a chat to Sage. Nova then mentions a transfer that never happens. Does this stay? | FR-21, FR-27, Terms | Citizen User | Open | 2026-11-27 |
 | Q14 | The chat mentions cancellation and a billing teammate, but the app offers neither action. Does this stay? | FR-17, FR-26 | Citizen User | Open | 2026-11-27 |
 | Q15 | Does the leave page need to work on phones, as today's two pages do? | FR-44, FR-45 | Citizen User | Open | 2026-11-27 |
+| Q16 | Which service does the company use for single sign-on? | FR-46 | Citizen User | Open | 2026-11-27 |
+| Q17 | Which HR system holds the leave balances? | FR-47, Terms | Citizen User | Open | 2026-11-27 |
+| Q18 | What happens when a person cannot sign in, or signs in but is not allowed in? | FR-46 | Citizen User | Open | 2026-11-27 |
+| Q19 | What happens when the HR system has no record or balance for a signed-in employee? | FR-44, FR-47 | Citizen User | Open | 2026-11-27 |
+| Q20 | What happens when the app cannot reach the HR system? | FR-44, FR-47 | Citizen User | Open | 2026-11-27 |
+| Q21 | How up to date must the shown leave balance be? | FR-47 | Citizen User | Open | 2026-11-27 |
+| Q22 | What does the leave page do before company single sign-on and the HR system are connected? | FR-46, FR-47 | Citizen User | Open | 2026-11-27 |
 
 ## Sources
-The request gives the leave page, and the existing files give today's behaviour.
+The request and the answered questions give the leave page, and the existing files give today's behaviour.
 
 - S1: The request, 2026-11-27: "Write the requirements for this app as it is today, plus one new page where an employee sees how many leave days they have left."
 - S2: server.mjs, the existing chat, order and store policy behaviour.
