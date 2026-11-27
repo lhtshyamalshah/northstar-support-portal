@@ -7,7 +7,7 @@ Each row is one goal for one user type.
 
 | User type | Journey | FR ids |
 | --- | --- | --- |
-| Customer | Get an answer about an order | FR-01 to FR-09, FR-12 to FR-17, FR-28, FR-29, FR-37 to FR-41, FR-58 |
+| Customer | Get an answer about an order | FR-01 to FR-09, FR-12 to FR-17, FR-28, FR-29, FR-37 to FR-41, FR-58 to FR-60 |
 | Customer | Check a store policy | FR-01 to FR-03, FR-18 to FR-20 |
 | Customer | Get billing help | FR-13, FR-21 to FR-27 |
 | Order desk visitor | Review the orders | FR-30 to FR-35 |
@@ -27,8 +27,9 @@ If things go differently:
 - 2a. The message holds no order ID while demo mode is off: the app asks for it; back to step 2. (FR-14)
 - 2b. The order ID matches no order: the app repeats that until a new chat or 10 later messages; back to step 2. (FR-07, FR-15, FR-16)
 - 2c. The message tries to override the assistant's instructions: the app shows the refusal reply; journey ends. (FR-37)
-- 3a. The customer starts a new chat before the reply appears: the app drops that reply; back to step 2. (FR-07, FR-58)
-- 3b. The customer tries to type in that new chat before the dropped reply arrives: see open question Q29 in functional-requirements.md.
+- 3a. The customer starts a new chat before the reply appears: the app drops that reply and shows no typing dots; back to step 2. (FR-07, FR-58, FR-59)
+- 3b. The customer sends a message in that new chat before the dropped reply arrives: the app accepts it; back to step 3. (FR-60)
+- 3c. The old message fails after the customer starts a new chat: see open question Q30 in functional-requirements.md.
 - 4a. The customer asks about cancelling while demo mode is off: the app says whether the order status allows it; journey ends. (FR-17)
 - 4b. Demo mode is on: the app gives a fixed reply; continues at step 5. (FR-28)
 - 4c. The AI service fails: the app asks the customer to try again; back to step 2. (FR-29)
@@ -49,7 +50,9 @@ flowchart TD
   s2 -.-> x2c["Step 2c: The message tries to override the assistant's instructions"]
   s3 -.-> x3a["Step 3a: The customer starts a new chat before the reply appears"]
   x3a -.-> s2
-  s3 -.-> x3b["Step 3b: The customer tries to type in that new chat before the dropped reply arrives"]
+  s3 -.-> x3b["Step 3b: The customer sends a message in that new chat before the dropped reply arrives"]
+  x3b -.-> s3
+  s3 -.-> x3c["Step 3c: The old message fails after the customer starts a new chat"]
   s4 -.-> x4a["Step 4a: The customer asks about cancelling while demo mode is off"]
   s4 -.-> x4b["Step 4b: Demo mode is on"]
   x4b -.-> s5

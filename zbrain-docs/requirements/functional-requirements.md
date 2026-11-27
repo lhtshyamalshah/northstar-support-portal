@@ -1,7 +1,7 @@
 # Functional requirements: Northstar Support Portal
 
 ## Purpose
-The app is a customer-support portal for an online store, with an open order desk. This version adds one page where an employee sees their annual leave days left, and drops old replies after a new chat.
+The app is a customer-support portal for an online store, with an open order desk. This version adds one page where an employee sees their annual leave days left, and makes a new chat ready without old replies.
 
 ## Users
 The app serves three user types. Today it has no sign-in, and this version adds company single sign-on for the leave page.
@@ -37,7 +37,7 @@ These words have one meaning each in the requirements.
 | Workday | The company's existing HR system, where leave balances come from and are kept correct. |
 
 ## Requirements
-The requirements describe the app as it behaves today, plus two pieces of new work. One is the leave page. The other is FR-58, because today an old reply still appears in a new chat.
+The requirements describe the app as it behaves today, plus two pieces of new work. One is the leave page. The other is FR-58 to FR-60, because today a new chat still waits for an old reply and shows it.
 
 ### Support chat
 | FR id | Requirement | Acceptance criteria | Source |
@@ -45,11 +45,13 @@ The requirements describe the app as it behaves today, plus two pieces of new wo
 | FR-01 | When a customer opens the support page, the app must start a chat with a greeting from Nova. | Nova offers help with an order, shipping, returns or cancellations. | S3 |
 | FR-02 | While a customer has sent no message, the app must offer 3 ready-made questions. | The customer sees Track an order, Return policy and Shipping times, and choosing one sends its question. | S3 |
 | FR-03 | When a customer sends a message, the app must show the assistant's reply in the chat. | A customer asks about the return policy and sees a reply under the message. | S2, S3 |
-| FR-04 | While a reply is on its way, the app must show that the assistant is typing. | Moving dots show until the reply appears. | S3 |
-| FR-05 | While a reply is on its way, the app must block a second message. | While the dots show, the message box takes no typing. | S3 |
+| FR-04 | While a chat waits for a reply to its own message, the app must show that the assistant is typing. | Moving dots show until the reply appears. | S3, Q29 |
+| FR-05 | While a chat waits for a reply to its own message, the app must block a second message. | While the dots show, the message box takes no typing. | S3, Q29 |
 | FR-06 | The app must limit each customer message to 2000 characters. | The message box stops taking text at 2000 characters. | S2, S3 |
 | FR-07 | When a customer chooses to start a new chat, the app must replace the chat with a new one with Nova. | After a chat with Sage, New chat shows only Nova's greeting. | S3 |
 | FR-58 | When a customer starts a new chat while a reply is on its way, the app must drop that reply. | A customer asks a question, starts a new chat before the answer shows, and never sees that answer there. | Q28 |
+| FR-59 | When a customer starts a new chat while a reply is on its way, the app must show the new chat without typing dots. | A customer starts a new chat while the dots show, and the new chat has no dots. | Q29 |
+| FR-60 | When a customer starts a new chat while a reply is on its way, the app must accept a message there at once. | A customer starts a new chat while the dots show, and is able to type and send a new question there. | Q29 |
 | FR-08 | If the app fails to process a message, then the app must show an error message in the chat. | The chat shows the error text, or a line saying something went wrong. | S2, S3 |
 | FR-09 | The app must keep each assistant reply to 3 sentences or fewer. | A reply about returns holds no more than 3 sentences. | S2 |
 | FR-10 | When a customer sends a message, the app must give the assistant that message and no more than 10 earlier ones. | In a long chat, an order ID typed more than 10 messages earlier no longer counts. | S2 |
@@ -164,7 +166,7 @@ The answered questions exclude these things.
 - Cancelling an order or reaching a billing teammate through the app: not in this version. (Q14)
 
 ## Open questions
-One point stays open: what a new chat does while a dropped reply is still on its way.
+One point stays open: whether an old message's error appears in a new chat.
 
 | Id | Question | Changes | Who answers | Answer | Date |
 | --- | --- | --- | --- | --- | --- |
@@ -196,7 +198,8 @@ One point stays open: what a new chat does while a dropped reply is still on its
 | Q26 | Does the leave balance also take away annual leave that is requested but still waiting for approval? | FR-54, Terms | Citizen User | Yes, take it off. | 2026-11-27 |
 | Q27 | The app's rules refuse the 11th order lookup in a conversation, but its tests expect the 9th to be refused. Which limit is right? | FR-40, Out of scope | Citizen User | Keep 10: the policy file's limit, as the app does today. The test that expects 8 is out of date. | 2026-11-27 |
 | Q28 | A customer can start a new chat while a reply is on its way, and that old reply then appears in the new chat. Does this stay? | FR-07, FR-58 | Citizen User | Drop the old reply: it never appears in the new chat. This changes today's behaviour. | 2026-11-27 |
-| Q29 | Today a new chat started during a reply shows typing dots and blocks typing until that old reply arrives. With that reply dropped, what must the new chat do? | FR-04, FR-05, FR-58 | Citizen User | Open | 2026-11-27 |
+| Q29 | Today a new chat started during a reply shows typing dots and blocks typing until that old reply arrives. With that reply dropped, what must the new chat do? | FR-04, FR-05, FR-59, FR-60 | Citizen User | Ready at once: no typing dots, and the customer can send a message straight away. This is new work. | 2026-11-27 |
+| Q30 | A customer starts a new chat, and then the old message fails. Today its error message appears in the new chat. Does this stay? | FR-08, FR-58 | Citizen User | Open | 2026-11-27 |
 
 ## Sources
 The request and the answered questions give the new work, and the existing files give today's behaviour.
