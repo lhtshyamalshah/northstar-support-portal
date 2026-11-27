@@ -111,9 +111,10 @@ function defaultSignInClient(settings) {
 
 /** Takes the work email (the sign-in name) only from a sign-in issued by the company's tenant to this app. */
 function workEmailFromClaims(claims, settings) {
-  const sameTenant = String(claims?.tid ?? "").toLowerCase() === settings.ENTRA_TENANT_ID.toLowerCase();
-  if (!sameTenant) throw failure("wrong_tenant");
-  if (claims.aud !== settings.ENTRA_CLIENT_ID) throw failure("wrong_audience");
+  // Both ids are GUIDs, so letter case does not matter.
+  const sameId = (claim, setting) => typeof claim === "string" && claim.toLowerCase() === setting.toLowerCase();
+  if (!sameId(claims?.tid, settings.ENTRA_TENANT_ID)) throw failure("wrong_tenant");
+  if (!sameId(claims.aud, settings.ENTRA_CLIENT_ID)) throw failure("wrong_audience");
   if (typeof claims.upn !== "string" || !claims.upn.trim()) throw failure("no_sign_in_name");
   return claims.upn.trim();
 }
