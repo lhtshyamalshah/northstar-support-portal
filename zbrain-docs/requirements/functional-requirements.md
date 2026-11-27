@@ -22,7 +22,7 @@ These words have one meaning each in the requirements.
 | Assistant | Nova or Sage. |
 | Nova | The assistant for general store support. |
 | Sage | The billing specialist assistant. |
-| Billing words | Words that move a chat to Sage: refund, refunded, refunding, invoice, billing. Also: double charge, duplicate charge, charged twice. Also: payment issue, payment problem, card charge, card payment. |
+| Billing words | Words that move a chat to Sage: refund, refunded, refunding, invoice, billing. Also: double charge, duplicate charge, charged twice. Also: payment issue, payment problem, card charge, card payment. Only these exact forms count, not their plurals. |
 | Order identifier (ID) | The code of one order, called the order ID: the Northstar prefix (NS) and 4 digits, like NS-1001. |
 | Order status | One of processing, shipped, delivered or refunded. |
 | Order desk | The page that lists the orders, labelled as an internal view. |
@@ -30,7 +30,7 @@ These words have one meaning each in the requirements.
 | Governance rules | ZBrain Governance limits on the chat. They apply unless the app's setup switches them off. |
 | Refusal reply | The reply that declines a request and asks about an order, shipping, returns, cancellations or billing. |
 | Hidden marker | A secret text placed in the assistants' instructions to detect leaks. |
-| Conversation | What the governance rules count against. Today it is identified by its opening message. |
+| Conversation | What the governance rules count against. It is named by the oldest customer message the assistant is given, at first the opening message. |
 | Leave page | The new page where an employee sees their leave balance. |
 | Leave balance | One total of annual leave days left. Approved leave not yet taken, and requests waiting for approval, count as used. |
 | Company single sign-on | The company's sign-in through Microsoft Entra ID, which tells the app which employee is looking at the leave page. |
@@ -57,12 +57,12 @@ The requirements describe the app as it behaves today, plus the leave page.
 ### Order questions
 | FR id | Requirement | Acceptance criteria | Source |
 | --- | --- | --- | --- |
-| FR-12 | When a customer's message holds a 4-digit number, with or without NS, the app must treat it as an order ID. | A customer asks about order 1001 and gets the answer for NS-1001. | S2 |
+| FR-12 | When a customer's message holds a 4-digit number, with or without NS, the app must treat it as an order ID. | A customer asks about order 1001 and gets the answer for NS-1001. A customer who types the year 2026 is told that NS-2026 was not found. | S2, Q12 |
 | FR-13 | When a customer gives a known order ID, the app must answer from that order's details, without asking the customer to sign in. | A customer who has not signed in asks about NS-1002 and learns that it has shipped. With demo mode off, a customer who asks the name and total on NS-1001 is able to get them. | S2, Q6 |
 | FR-14 | While demo mode is off, when a customer asks about one order without an order ID, the app must ask for it. | A customer asks where their order is, and Nova asks for the order ID. | S2 |
-| FR-15 | If a customer gives an order ID that matches no order, then the app must reply that it did not find that order. | A customer asks about NS-9999 and is asked to check the ID. | S2 |
-| FR-16 | While an unknown order ID is in the new message or the 10 before it, the app must repeat the not-found reply. | After asking about NS-9999, a customer asks about NS-1001 and still hears that NS-9999 was not found. | S2 |
-| FR-17 | When a customer asks about cancelling an order, the app must say cancellation is allowed only while its status is processing. | For NS-1001, which is processing, the reply says cancellation is still possible. | S2 |
+| FR-15 | If a customer gives an order ID that matches no order, then the app must reply that it did not find that order. | A customer asks about NS-9999 and is asked to check the ID. | S2, Q12 |
+| FR-16 | While an unknown order ID is in the new message or the 10 before it, the app must repeat the not-found reply. | After asking about NS-9999, a customer asks about NS-1001 and still hears that NS-9999 was not found. | S2, Q12 |
+| FR-17 | While demo mode is off, when a customer asks about cancelling an order, the app must say only processing orders allow cancellation. | For NS-1001, which is processing, the reply says cancellation is still possible. | S2, Q14 |
 
 ### Store policies
 | FR id | Requirement | Acceptance criteria | Source |
@@ -74,13 +74,13 @@ The requirements describe the app as it behaves today, plus the leave page.
 ### Billing
 | FR id | Requirement | Acceptance criteria | Source |
 | --- | --- | --- | --- |
-| FR-21 | When a customer's message holds one of the billing words, the app must hand the chat from Nova to Sage. | A customer writes that they were charged twice, and Sage replies. | S2 |
+| FR-21 | When a customer's message holds one of the billing words, the app must hand the chat from Nova to Sage. | A customer writes that they were charged twice, and Sage replies. A message that asks only about "refunds", in the plural, stays with Nova. | S2, Q13 |
 | FR-22 | When a chat passes from Nova to Sage, the app must show a transfer notice. | Before Sage's first reply, a notice says the conversation was transferred to the billing specialist. | S3 |
 | FR-23 | While a chat is with Sage, the app must send every later message to Sage. | After the transfer, Sage answers a shipping question until the customer starts a new chat. | S2, S3 |
 | FR-24 | While a chat is with Sage, the app must show Sage as the billing specialist at the top of the chat. | The chat heading reads Sage, billing specialist. | S3 |
 | FR-25 | While demo mode is off, when Sage answers a refund question, the app must state the refund time and destination. | Sage says refunds take 5 to 7 business days and go to the original payment method. | S2 |
-| FR-26 | While demo mode is off, when Sage needs an order ID, the app must ask for it, mentioning review by a billing teammate. | Sage asks for the order ID and says a billing teammate is able to review the account. | S2 |
-| FR-27 | While demo mode is off, if a billing matter reaches Nova, then the app must say the customer is being transferred to billing. | A customer asks Nova about a billing matter without a billing word, and Nova mentions a transfer. | S2 |
+| FR-26 | While demo mode is off, when Sage needs an order ID, the app must ask for it, mentioning review by a billing teammate. | Sage asks for the order ID and says a billing teammate is able to review the account. | S2, Q14 |
+| FR-27 | While demo mode is off, if a billing matter reaches Nova, then the app must say the customer is being transferred to billing. | A customer asks Nova about their invoices, in the plural, and Nova mentions a transfer. | S2, Q13 |
 
 ### Demo mode and AI failures
 | FR id | Requirement | Acceptance criteria | Source |
@@ -104,9 +104,10 @@ The requirements describe the app as it behaves today, plus the leave page.
 | --- | --- | --- | --- |
 | FR-37 | While governance rules are on, if a message tries to override an assistant's instructions, then the app must show the refusal reply. | A customer asks the assistant to ignore all previous instructions and reveal them, and gets the refusal reply. | S2, S6 |
 | FR-38 | While governance rules are on, if an assistant's reply holds a hidden marker, then the app must show the refusal reply instead. | The customer sees the refusal reply and never the marker. | S2, S4, S6 |
-| FR-39 | While governance rules are on and an assistant has used 10 AI model calls in a conversation, the app must refuse its next call. | With demo mode off, a customer's 6th order question to Nova in one chat gets the refusal reply. | S2, S4 |
-| FR-40 | While governance rules are on, when a conversation has used 10 order lookups, the app must refuse the next lookup. | An 11th order lookup in one conversation gets the refusal reply. | S2, S4 |
-| FR-41 | While governance rules are on, the app must count chats with the same opening message as one conversation until a restart. | With demo mode off, 5 visitors choose Track an order, and a 6th who chooses it gets the refusal reply. | S2, S4 |
+| FR-39 | While governance rules are on and an assistant has used 10 AI model calls in a conversation, the app must refuse its next call. | With demo mode off, a customer's 6th order question to Nova in one chat gets the refusal reply. | S2, S4, Q11 |
+| FR-40 | While governance rules are on, when a conversation has used 10 order lookups, the app must refuse the next lookup. | An 11th order lookup in one conversation gets the refusal reply. | S2, S4, Q11 |
+| FR-41 | While governance rules are on, the app must count chats with the same opening message as one conversation until a restart. | With demo mode off, 5 visitors choose Track an order, and a 6th who chooses it gets the refusal reply. | S2, S4, Q11 |
+| FR-57 | While governance rules are on, the app must count a chat past 10 earlier messages by the oldest customer message among those 10. | With demo mode off and each question worded anew, the 6th order question is refused and the 7th gets an answer. | S2, S4, Q11 |
 | FR-42 | While governance rules are on and demo mode is off, when an assistant reads an order, the app must record an audit entry. | The governance records hold an entry for a lookup of NS-1002. | S4 |
 | FR-43 | If governance rules are on and their settings are missing, then the app must refuse to start. | With the governance key missing, no chat message gets a reply. | S4 |
 
@@ -155,9 +156,13 @@ The answered questions exclude these things.
 - Signing in to open the order desk: not in this version. (Q5)
 - Checking who a customer is before the chat gives order details: not in this version. (Q6)
 - Replacing the 10 sample orders with other order data: not in this version. (Q7)
+- Changing how the governance rules count conversations: not in this version. (Q11)
+- Changing which numbers count as order IDs, or how an unknown one blocks later replies: not in this version. (Q12)
+- Moving a chat to Sage on the plurals "refunds" or "invoices": not in this version. (Q13)
+- Cancelling an order or reaching a billing teammate through the app: not in this version. (Q14)
 
 ## Open questions
-Parts of today's behaviour need a keep or change decision, and the leave page has one open point about phones.
+Three points stay open: the leave page on phones, the order lookup limit and a late reply after a new chat.
 
 | Id | Question | Changes | Who answers | Answer | Date |
 | --- | --- | --- | --- | --- | --- |
@@ -171,22 +176,24 @@ Parts of today's behaviour need a keep or change decision, and the leave page ha
 | Q8 | What does the leave page show, and for which types of leave? | FR-44, Terms, Out of scope | Citizen User | One total. | 2026-11-27 |
 | Q9 | Do Nova or Sage answer questions about leave? | Out of scope | Citizen User | No. Settled by the Q10 answer "Nothing else": only the leave page shows the leave balance. | 2026-11-27 |
 | Q10 | Is anything else about leave wanted in this version, beyond seeing the days left? | Leave days, Out of scope | Citizen User | Nothing else. | 2026-11-27 |
-| Q11 | Chats with the same opening message share governance limits, so later visitors are refused. Long chats start a new count. Does this stay? | FR-39, FR-40, FR-41 | Citizen User | Open | 2026-11-27 |
-| Q12 | Any 4-digit number, even a year, counts as an order ID. One unknown number then blocks later replies. Does this stay? | FR-12, FR-15, FR-16 | Citizen User | Open | 2026-11-27 |
-| Q13 | The plural words refunds and invoices do not move a chat to Sage. Nova then mentions a transfer that never happens. Does this stay? | FR-21, FR-27, Terms | Citizen User | Open | 2026-11-27 |
-| Q14 | The chat mentions cancellation and a billing teammate, but the app offers neither action. Does this stay? | FR-17, FR-26 | Citizen User | Open | 2026-11-27 |
+| Q11 | Chats with the same opening message share governance limits, so later visitors are refused. Long chats start a new count. Does this stay? | FR-39, FR-40, FR-41, FR-57, Terms, Out of scope | Citizen User | Keep as today. | 2026-11-27 |
+| Q12 | Any 4-digit number, even a year, counts as an order ID. One unknown number then blocks later replies. Does this stay? | FR-12, FR-15, FR-16, Out of scope | Citizen User | Keep both as today. | 2026-11-27 |
+| Q13 | The plural words refunds and invoices do not move a chat to Sage. Nova then mentions a transfer that never happens. Does this stay? | FR-21, FR-27, Terms, Out of scope | Citizen User | Keep as today. | 2026-11-27 |
+| Q14 | The chat mentions cancellation and a billing teammate, but the app offers neither action. Does this stay? | FR-17, FR-26, Out of scope | Citizen User | Keep as today. | 2026-11-27 |
 | Q15 | Does the leave page need to work on phones, as today's two pages do? | FR-44, FR-45 | Citizen User | Open | 2026-11-27 |
 | Q16 | Which service does the company use for single sign-on? | FR-46, Terms | Citizen User | Microsoft Entra ID. | 2026-11-27 |
 | Q17 | Which HR system holds the leave balances? | FR-47, Terms | Citizen User | Workday. | 2026-11-27 |
 | Q18 | What happens when a person cannot sign in, or signs in but is not allowed in? | FR-49 | Citizen User | Say it's unavailable: a message that the page is not available to them. | 2026-11-27 |
 | Q19 | What happens when Workday has no record or balance for a signed-in employee? | FR-55 | Citizen User | No balance found: a message saying no balance was found. | 2026-11-27 |
-| Q20 | What happens when the app cannot reach Workday? | FR-56 | Citizen User | Can't show right now: a message that the balance cannot be shown right now. | 2026-11-27 |
+| Q20 | What happens when the app cannot reach Workday? | FR-56 | Citizen User | Cannot show right now: a message that the balance cannot be shown right now. | 2026-11-27 |
 | Q21 | How up to date must the shown leave balance be? | FR-50 | Citizen User | Current on each visit. | 2026-11-27 |
 | Q22 | What does the leave page do before Microsoft Entra ID and Workday are connected? | FR-52 | Citizen User | Say not set up yet. | 2026-11-27 |
 | Q23 | Which kinds of leave in Workday count toward the one total on the leave page? | FR-44, FR-47, Terms, Out of scope | Citizen User | Annual leave only. | 2026-11-27 |
 | Q24 | Does the leave balance take away annual leave that is approved but not yet taken? | FR-51, Terms | Citizen User | Yes, take it off. | 2026-11-27 |
 | Q25 | Who has access to the leave page: everyone who signs in with company single sign-on, or only a limited group? | FR-49, FR-53, Users, Out of scope | Citizen User | Anyone with sign-in: everyone who can use the company's Microsoft Entra ID sign-in. | 2026-11-27 |
 | Q26 | Does the leave balance also take away annual leave that is requested but still waiting for approval? | FR-54, Terms | Citizen User | Yes, take it off. | 2026-11-27 |
+| Q27 | The app's rules refuse the 11th order lookup in a conversation, but its tests expect the 9th to be refused. Which limit is right? | FR-40 | Citizen User | Open | 2026-11-27 |
+| Q28 | A customer can start a new chat while a reply is on its way, and that old reply then appears in the new chat. Does this stay? | FR-07 | Citizen User | Open | 2026-11-27 |
 
 ## Sources
 The request and the answered questions give the leave page, and the existing files give today's behaviour.
@@ -196,7 +203,7 @@ The request and the answered questions give the leave page, and the existing fil
 - S3: src/main.jsx, the existing support page and order desk.
 - S4: governance.mjs and governance/solution-policy.json, the existing governance rules.
 - S5: governance/solution-manifest.json, the declared assistants and their order lookup.
-- S6: test/governance.test.mjs, the existing governance tests.
+- S6: test/governance.test.mjs, the existing governance tests. Their order lookup limit disagrees with S4 (Q27).
 - S7: `README.md`, the existing setup and behaviour notes.
 - S8: public/styles.css, the existing screen layouts.
 - S9: integrations-config.json, the AI key setting.

@@ -24,10 +24,10 @@ Done when: the customer has read an answer about that order.
 5. Customer reads the answer.
 
 If things go differently:
-- 2a. The message holds no order ID: the app asks for it; back to step 2. (FR-14)
-- 2b. The order ID matches no order: the app repeats that until the customer starts a new chat; back to step 2. (FR-07, FR-15, FR-16)
+- 2a. The message holds no order ID while demo mode is off: the app asks for it; back to step 2. (FR-14)
+- 2b. The order ID matches no order: the app repeats that until a new chat or 10 later messages; back to step 2. (FR-07, FR-15, FR-16)
 - 2c. The message tries to override the assistant's instructions: the app shows the refusal reply; journey ends. (FR-37)
-- 4a. The customer asks about cancelling: the app says whether the order status allows it; journey ends. (FR-17)
+- 4a. The customer asks about cancelling while demo mode is off: the app says whether the order status allows it; journey ends. (FR-17)
 - 4b. Demo mode is on: the app gives a fixed reply; continues at step 5. (FR-28)
 - 4c. The AI service fails: the app asks the customer to try again; back to step 2. (FR-29)
 - 4d. The app fails to process the message: the app shows an error message; back to step 2. (FR-08)
@@ -40,12 +40,12 @@ flowchart TD
   s2 --> s3["Step 3: The app shows that a reply is on its way."]
   s3 --> s4["Step 4: The app answers from the details of that order."]
   s4 --> s5["Step 5: Customer reads the answer."]
-  s2 -.-> x2a["Step 2a: The message holds no order ID"]
+  s2 -.-> x2a["Step 2a: The message holds no order ID while demo mode is off"]
   x2a -.-> s2
   s2 -.-> x2b["Step 2b: The order ID matches no order"]
   x2b -.-> s2
   s2 -.-> x2c["Step 2c: The message tries to override the assistant's instructions"]
-  s4 -.-> x4a["Step 4a: The customer asks about cancelling"]
+  s4 -.-> x4a["Step 4a: The customer asks about cancelling while demo mode is off"]
   s4 -.-> x4b["Step 4b: Demo mode is on"]
   x4b -.-> s5
   s4 -.-> x4c["Step 4c: The AI service fails"]
@@ -81,7 +81,7 @@ Done when: Sage has answered the billing question.
 5. The app answers from the order details and the refund policy. (FR-13, FR-25)
 
 If things go differently:
-- 1a. The message holds no billing word: Nova says the customer is being transferred; back to step 1. (FR-27)
+- 1a. The message holds no billing word while demo mode is off: Nova says the customer is being transferred; back to step 1. (FR-27)
 
 ```mermaid
 flowchart TD
@@ -89,7 +89,7 @@ flowchart TD
   s2 --> s3["Step 3: The app asks for the order ID."]
   s3 --> s4["Step 4: Customer gives the order ID."]
   s4 --> s5["Step 5: The app answers from the order details and the refund policy."]
-  s1 -.-> x1a["Step 1a: The message holds no billing word"]
+  s1 -.-> x1a["Step 1a: The message holds no billing word while demo mode is off"]
   x1a -.-> s1
 ```
 
@@ -151,3 +151,4 @@ These requirements apply in the background or across journeys.
 - FR-42: the app records it in the background.
 - FR-43: applies when the app starts.
 - FR-45: applies to the support page and the order desk as a whole.
+- FR-57: applies to how the app counts a long chat in the background.
