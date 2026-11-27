@@ -28,9 +28,9 @@ These words have one meaning in all the documents.
 | Refusal message | The reply that declines a request and asks for an order, shipping, returns, cancellation or billing question. |
 | Hidden marker | A secret code inside an assistant's instructions that reveals a leak of those instructions. |
 | Chat count | The tally kept for all chats with the same opening message, until the app restarts. A chat with over 10 earlier messages counts under a later message. |
-| Leave days left | The annual leave days the HR system records as remaining for an employee in the calendar year, January to December. |
+| Leave days left | The annual leave days the HR system records as remaining today for an employee, in the calendar year January to December. |
 | Company sign-in | The company's sign-in, Microsoft Entra ID, which tells the app which employee is looking. |
-| HR system | Workday, the company's existing system that the leave numbers come from. |
+| HR system | Workday, the company's existing system, which keeps one annual leave balance for each employee, in days. |
 
 ## Requirements
 Each area below states what the app does today, except Leave days, which is new.
@@ -113,8 +113,9 @@ Each area below states what the app does today, except Leave days, which is new.
 | FR id | Requirement | Acceptance criteria | Source |
 | --- | --- | --- | --- |
 | FR-47 | When an employee opens the new leave days page, the app must show that employee's annual leave days left for the current calendar year. | An employee reads their own number, which counts annual leave only, from January to December. | S1, Q2, Q4 |
-| FR-51 | When an employee opens the leave days page, the app must identify the employee through the company sign-in. | An employee has signed in with their Microsoft Entra ID account before they read a number. | Q1, Q16 |
-| FR-52 | The app must show the leave days left exactly as the HR system records them as remaining. | An employee reads the same remaining number on the page and in their own Workday record. | Q3, Q17, Q18 |
+| FR-51 | When an employee opens the leave days page, the app must identify the employee through the company sign-in. | An employee has signed in with their Microsoft Entra ID account before they read a number. | Q1, Q7, Q16 |
+| FR-52 | The app must show the leave days left exactly as the HR system records them as remaining today. | An employee reads one number of days, which matches today's remaining annual leave in their Workday record. | Q3, Q17, Q18, Q20, Q21, Q22 |
+| FR-53 | The app must show a link to the leave days page on the support page. | A person who has not signed in sees the link on the support page. | Q7 |
 
 ### Whole app
 | FR id | Requirement | Acceptance criteria | Source |
@@ -132,6 +133,7 @@ Each line names an action a tester tries and sees refused.
 - The app must never show a customer a reply that contains a hidden marker. (S4, S6)
 - The app must never write a customer's message text into its log of governance decisions. (S4, S6)
 - The app must never show an employee's leave days left to anyone but that employee. (Q2)
+- The app must never open the leave days page to a person without a company sign-in. (Q7)
 
 ## Out of scope
 The requester's answers exclude these three things.
@@ -151,7 +153,7 @@ These rows record answered questions, points with no source, and behaviour today
 | Q4 | Which leave does the number count, and over which leave year? | FR-47, Terms, Out of scope | Requester | Annual leave only, over the calendar year January to December. | 27 Nov 2026 |
 | Q5 | What does the leave days page offer besides the days left? | FR-47, Out of scope | Requester | Nothing else. | 27 Nov 2026 |
 | Q6 | What does an employee see when the app has no leave number for them? | FR-47 | Requester | Open | 27 Nov 2026 |
-| Q7 | How do employees reach the new page, given that customers use the same app? | FR-46, FR-47 | Requester | Open | 27 Nov 2026 |
+| Q7 | How do employees reach the new page, given that customers use the same app? | FR-51, FR-53, Must never | Requester | Link on support page: anyone sees the link, but the page needs company sign-in. | 27 Nov 2026 |
 | Q8 | The order desk shows customer names and totals to anyone, and the support page links to it. Who is it for? | FR-41, FR-42, FR-46, Users | Requester | Open | 27 Nov 2026 |
 | Q9 | Anyone who types an order ID gets its details, and Track an order names sample order NS-1002. Is that intended? | FR-03, FR-16 | Requester | Open | 27 Nov 2026 |
 | Q10 | Any four digits count as an order ID. One unknown ID also blocks later messages in that chat. Keep this? | FR-17, FR-19 | Requester | Open | 27 Nov 2026 |
@@ -164,9 +166,10 @@ These rows record answered questions, points with no source, and behaviour today
 | Q17 | Which HR system holds the leave records? | FR-52, Terms | Requester | Workday. | 27 Nov 2026 |
 | Q18 | Does the page show the HR system's days left as recorded, or must the app work them out? | FR-47, FR-52, Terms | Requester | HR system's number: show exactly what it records as remaining. | 27 Nov 2026 |
 | Q19 | What does an employee see when the company sign-in or the HR system is unavailable? | FR-47, FR-51, FR-52 | Requester | Open | 27 Nov 2026 |
-| Q20 | Workday keeps a time off balance in days or in hours. What must the page show if annual leave is in hours? | FR-47, FR-52, Terms | Requester | Open | 27 Nov 2026 |
-| Q21 | Workday gives a balance as of a chosen date. Which date's remaining number must the page show? | FR-47, FR-52, Terms | Requester | Open | 27 Nov 2026 |
-| Q22 | What must the page show if Workday holds more than one annual leave balance for an employee? | FR-47, FR-52 | Requester | Open | 27 Nov 2026 |
+| Q20 | Workday keeps a time off balance in days or in hours. What must the page show if annual leave is in hours? | FR-52, Terms | Requester | Kept in days: annual leave is already in days, so hours do not arise. | 27 Nov 2026 |
+| Q21 | Workday gives a balance as of a chosen date. Which date's remaining number must the page show? | FR-52, Terms | Requester | Today. | 27 Nov 2026 |
+| Q22 | What must the page show if Workday holds more than one annual leave balance for an employee? | FR-52, Terms | Requester | Only ever one: each employee has a single annual leave balance. | 27 Nov 2026 |
+| Q23 | Anyone sees the leave days link. What does a person see who cannot complete the company sign-in? | FR-51, FR-53 | Requester | Open | 27 Nov 2026 |
 
 ## Sources
 - S1: The request, 27 Nov 2026: "Write the requirements for this app as it is today, plus one new page where an employee sees how many leave days they have left."

@@ -11,7 +11,7 @@ Each user type has at least one journey.
 | Customer | Learn a store rule | FR-01, FR-04, FR-12, FR-14, FR-21, FR-22, FR-24, FR-25, FR-32 |
 | Customer | Get billing help | FR-10, FR-13, FR-23, FR-26, FR-27, FR-28, FR-29, FR-30, FR-31, FR-32 |
 | Order desk visitor | Review the orders | FR-41, FR-42, FR-43, FR-44, FR-45, FR-46 |
-| Employee | See leave days left | FR-47, FR-51, FR-52 |
+| Employee | See leave days left | FR-47, FR-51, FR-52, FR-53 |
 
 ## Customer: check on an order
 When: a customer wants news of an order.
@@ -139,22 +139,24 @@ flowchart TD
 When: an employee wants to know their remaining annual leave.
 Done when: the employee has read their leave days left.
 
-1. Employee opens the leave days page. (FR-47)
+1. Employee opens the leave days page from the support page. (FR-47, FR-53)
 2. The app identifies the employee through the company sign-in. (FR-51)
-3. The app shows the leave days left that the HR system records as remaining. (FR-47, FR-52)
+3. The app shows the leave days left that the HR system records as remaining today. (FR-47, FR-52)
 4. Employee reads the number of leave days left.
 
 If things go differently:
 - 2a. The company sign-in is unavailable: see open question Q19 in functional-requirements.md.
+- 2b. The person cannot complete the company sign-in: see open question Q23 in functional-requirements.md.
 - 3a. The HR system is unavailable: see open question Q19 in functional-requirements.md.
 - 3b. The HR system has no leave number for the employee: see open question Q6 in functional-requirements.md.
 
 ```mermaid
 flowchart TD
-  s1["Step 1: Employee opens the leave days page"] --> s2["Step 2: The app identifies the employee through the company sign-in"]
-  s2 --> s3["Step 3: The app shows the leave days left that the HR system records as remaining"]
+  s1["Step 1: Employee opens the leave days page from the support page"] --> s2["Step 2: The app identifies the employee through the company sign-in"]
+  s2 --> s3["Step 3: The app shows the leave days left that the HR system records as remaining today"]
   s3 --> s4["Step 4: Employee reads the number of leave days left"]
   s2 -.-> x2a["Step 2a: The company sign-in is unavailable"]
+  s2 -.-> x2b["Step 2b: The person cannot complete the company sign-in"]
   s3 -.-> x3a["Step 3a: The HR system is unavailable"]
   s3 -.-> x3b["Step 3b: The HR system has no leave number for the employee"]
 ```
