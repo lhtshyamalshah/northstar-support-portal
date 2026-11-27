@@ -125,5 +125,5 @@ These rows hold the two points on the assistants that no source settles.
 
 | Id | Question | Changes | Who answers | Answer | Date |
 | --- | --- | --- | --- | --- | --- |
-| Q44 | A message that the safety rules refuse stays in the chat, and goes to the AI unchecked with the next message. Must this change? | Agent decision, Nova and Sage inputs, FR-34 | AI Developer | Open | 27 Nov 2026 |
-| Q45 | After release, must anyone watch or test the assistants beyond today's records and rule checks? | Observability: Action log, Evals, Alerts | AI Developer | Open | 27 Nov 2026 |
+| Q44 | A message that the safety rules refuse stays in the chat, and goes to the AI unchecked with the next message. Must this change? | Agent decision, Nova and Sage inputs, FR-34 | AI Developer | Open. Asked in chat, and the AI Developer chose no option. | 27 Nov 2026 |
+| Q45 | After release, must anyone watch or test the assistants beyond today's records and rule checks? | Observability: Action log, Evals, Alerts | AI Developer | Open. Asked in chat, and the AI Developer chose no option. | 27 Nov 2026 |
