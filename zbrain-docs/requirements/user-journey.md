@@ -1,6 +1,6 @@
 # User journeys: Northstar Support Portal
 
-The journeys cover how customers get support, how order desk visitors read orders and how employees check leave days. An order identifier (ID) names one order.
+The journeys cover how customers get support, how order desk visitors read orders and how employees check annual leave days. An order identifier (ID) names one order.
 
 ## Journeys
 Each row is one goal for one user type.
@@ -11,7 +11,7 @@ Each row is one goal for one user type.
 | Customer | Check a store policy | FR-01 to FR-03, FR-18 to FR-20 |
 | Customer | Get billing help | FR-13, FR-21 to FR-27 |
 | Order desk visitor | Review the orders | FR-30 to FR-35 |
-| Employee | Check leave days left | FR-44, FR-46 to FR-48 |
+| Employee | Check annual leave days left | FR-44, FR-46 to FR-48 |
 
 ## Customer: get an answer about an order
 When: the customer wants to know where an order stands.
@@ -114,14 +114,14 @@ flowchart TD
   x3a -.-> s1
 ```
 
-## Employee: check leave days left
-When: the employee wants to know how many leave days they have left.
+## Employee: check annual leave days left
+When: the employee wants to know how many annual leave days they have left.
 Done when: the employee has seen their leave balance.
 
 1. Employee opens the leave page at its own address. (FR-48)
 2. Employee signs in with company single sign-on through Microsoft Entra ID. (FR-46)
 3. The app takes the employee's leave balance from Workday. (FR-47)
-4. The app shows the employee their leave balance as one total. (FR-44)
+4. The app shows the employee their leave balance as one total of annual leave days. (FR-44)
 5. Employee reads the leave balance.
 
 If things go differently:
@@ -133,7 +133,7 @@ If things go differently:
 flowchart TD
   s1["Step 1: Employee opens the leave page at its own address."] --> s2["Step 2: Employee signs in with company single sign-on through Microsoft Entra ID."]
   s2 --> s3["Step 3: The app takes the employee's leave balance from Workday."]
-  s3 --> s4["Step 4: The app shows the employee their leave balance as one total."]
+  s3 --> s4["Step 4: The app shows the employee their leave balance as one total of annual leave days."]
   s4 --> s5["Step 5: Employee reads the leave balance."]
   s2 -.-> x2a["Step 2a: The employee cannot sign in"]
   s3 -.-> x3a["Step 3a: Workday holds no balance for the employee"]
