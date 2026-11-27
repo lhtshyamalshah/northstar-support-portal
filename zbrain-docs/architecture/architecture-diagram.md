@@ -16,7 +16,7 @@ flowchart LR
   fonts["Google Fonts<br/>Outside system: web fonts"]
   customer -->|"Chats about orders, rules and billing: HTTP"| web
   visitor -->|"Reads the order list: HTTP"| web
-  employee -->|"Reads their leave days left: HTTPS"| web
+  employee -->|"Reads their leave days left: HTTP or HTTPS, open as Q37"| web
   employee -->|"Signs in with the company account: HTTPS"| entra
   web -->|"Sends chat, order, sign-in and leave days requests: JSON over HTTP"| api
   web -->|"Loads page fonts: HTTPS"| fonts
@@ -26,4 +26,4 @@ flowchart LR
   api -->|"Gets a token and reads the annual leave report: HTTPS"| workday
 ```
 
-Container diagram of the whole portal, including the leave days connections. Boxes are people, running parts or outside systems, and arrows show who starts each call. The box "Customer AWS account" holds the Portal service and the Web app files it serves, although the Web app runs in the browser. Browser redirects during sign-in are left out, and nothing is grouped.
+Container diagram of the whole portal, with leave days details still Open as Q37, Q42 and Q43 in architecture.md. Boxes are people, running parts or outside systems, and arrows show who starts each call. The box "Customer AWS account" holds the Portal service and the Web app files it serves, although the Web app runs in the browser. Browser redirects during sign-in are left out, and nothing is grouped.

@@ -1,6 +1,6 @@
 # Architecture: Northstar Support Portal
 
-The app has two parts: the Web app in the browser, and the Portal service, which serves it and the API. The Portal service runs as one Docker container in the customer's AWS account and finds orders by identifier (ID). For the leave days page, it signs employees in with Microsoft Entra ID, keeps sessions in memory and reads a Workday report. The design keeps the existing JavaScript, React, Express and governance code.
+The app has two parts: the Web app in the browser, and the Portal service, which serves it and the API. The Portal service runs as one Docker container in the customer's AWS account and finds orders by identifier (ID). For the leave days page, it signs employees in with Microsoft Entra ID, keeps sessions in memory and reads a Workday report. The design keeps the existing JavaScript, React, Express and governance code, and Open questions keep the leave days page incomplete.
 
 ## Stack and templates
 The app keeps its own stack and starts from no new template.
@@ -34,7 +34,7 @@ zbrain-docs/   Planning documents
 ```
 
 ## Environment variables
-The platform supplies these at run time, and the entries marked New serve the leave days page.
+The platform supplies these at run time, and the entries marked New serve the leave days page. Q30 is Open on startup when a sign-in or Workday setting is missing. Q37 is Open on the HTTPS address that `ENTRA_REDIRECT_URI` needs once deployed.
 
 ### Web app
 | Name | Purpose | Secret | Example |
@@ -112,7 +112,9 @@ These flows cover the journeys that call an outside system.
 
 The balance is as of the local date where the employee is (Q28). The report is not built yet and will use the field names the app expects (Q41). It picks the annual leave plan itself (Q40).
 
-The report must return one balance for each Workday record with that work email. A report with no balance, or more than one, gets the employee no number. Q42 and Q43 are Open on the field names and on how the app learns the date.
+The report must return one balance for each Workday record with that work email. A report with no balance, or more than one, gets the employee no number.
+
+Q42 is Open on the report's field names, so step 8 is incomplete. Q43 is Open on how the app learns the date, so steps 6 and 8 are incomplete.
 
 Three questions in functional-requirements.md are Open, so this design gives their cases no behaviour. They are Q6 (no leave number), Q19 (sign-in or Workday unavailable) and Q23 (a person who cannot sign in).
 
@@ -124,7 +126,7 @@ The app calls these outside systems.
 | OpenAI | Gets Nova's and Sage's replies through the Responses API | Out from the Portal service | API key | FR-04, FR-09, FR-33 |
 | ZBrain Governance service | Registers the app, gets policy rules, sends audit and violation records | Out from the Portal service | Bearer API key | FR-34, FR-39, FR-40 |
 | Microsoft Entra ID | Signs employees in and supplies their sign-in name | Browser redirect, and out from the Portal service | Company account for employees; client secret for the app | FR-51 |
-| Workday | Runs a new dedicated report that takes a work email and returns only the annual leave balance | Out from the Portal service, read only | OAuth 2.0 refresh token of the app's system account, limited to leave balances | FR-47, FR-52 |
+| Workday | Runs a new dedicated report that takes a work email and returns only the annual leave balance. Q42 is Open on its field names. | Out from the Portal service, read only | OAuth 2.0 refresh token of the app's system account, limited to leave balances | FR-47, FR-52 |
 | Google Fonts | Loads the page fonts, as index.html does today | Out from the Web app | None | Whole app |
 
 ## API contract
@@ -159,6 +161,15 @@ Each technical requirement (TR) covers today's app or the leave days page. Where
 - Q12: TR-06.
 - Q13 and Q14: TR-08, TR-11 and TR-13.
 - Q15: TR-12.
+
+These design questions are also Open, and the rows leave their points unsettled:
+
+- Q30: no row says how the Portal service starts without a sign-in or Workday setting, which TR-23 and TR-25 need.
+- Q31: no row requires or forbids a record of who looked up their leave days.
+- Q32: no quality row sets an answer time or a number of employees for the leave days page.
+- Q37: on a deployed address, TR-38 needs HTTPS, which nobody has confirmed.
+- Q42: TR-43 names no field for the Workday report.
+- Q43: TR-25 names no way to learn the employee's local date.
 
 | TR id | Kind | Requirement | FR ids covered |
 | --- | --- | --- | --- |
@@ -230,8 +241,8 @@ These rows record the design questions, answered or Open.
 | Q27 | How does the app know which Workday balance is annual leave? | Environment variables, TR-25 | AI Developer | One plan for everyone: one leave plan, named in the app's settings. Q40 later moved the plan choice into the report. | 27 Nov 2026 |
 | Q28 | Which time zone's date counts as today for the balance? | Data flow, TR-25, FR-52 | AI Developer | Employee's date: the local date where the employee is. | 27 Nov 2026 |
 | Q29 | How long does an employee stay signed in to the leave days page? | Stack and templates, Data flow, TR-40 | AI Developer | 8 hours. | 27 Nov 2026 |
-| Q30 | Must the app start when the sign-in or Workday settings are missing? | TR-23, TR-25 | AI Developer | Open | 27 Nov 2026 |
-| Q31 | Must the app record who looked up their leave days? | Technical requirements, FR-47 | AI Developer | Open | 27 Nov 2026 |
+| Q30 | Must the app start when the sign-in or Workday settings are missing? | Environment variables, TR-23, TR-25 | AI Developer | Open. Asked in chat, and the AI Developer chose no option. | 27 Nov 2026 |
+| Q31 | Must the app record who looked up their leave days? | Technical requirements, FR-47 | AI Developer | Open. Asked in chat, and the AI Developer chose no option. | 27 Nov 2026 |
 | Q32 | How soon must the leave days page answer, and for how many employees? | Technical requirements | AI Developer | Open | 27 Nov 2026 |
 | Q33 | How does the app prove to Microsoft Entra ID that it is the registered app? | Environment variables, Integrations, TR-41 | AI Developer | Secret: an Entra ID client secret, which needs renewing. | 27 Nov 2026 |
 | Q34 | How does the app's Workday system account sign in to Workday? | Environment variables, Integrations, TR-39 | AI Developer | Token: token-based access to Workday. | 27 Nov 2026 |
@@ -242,5 +253,5 @@ These rows record the design questions, answered or Open.
 | Q39 | Has the company confirmed that each sign-in name matches that employee's Workday work email, and never passes to someone else? | Stack and templates, TR-24, TR-37 | AI Developer | Both confirmed: each sign-in name matches the Workday work email and never passes to someone else. | 27 Nov 2026 |
 | Q40 | The Workday report takes only the email. Does the report itself pick the annual leave plan, or must the app send the plan name? | Environment variables, TR-25, TR-42, TR-43 | AI Developer | Report decides: the report itself returns only the annual leave plan. | 27 Nov 2026 |
 | Q41 | Does the Workday report already exist, with its own names for the email input and the balance? | Integrations, Data flow, TR-43 | AI Developer | Not yet: it will be built to match the field names the app expects. | 27 Nov 2026 |
-| Q42 | Which names must the new Workday report use for the work email, the date and the days left? | Data flow, Integrations, TR-43 | AI Developer | Open | 27 Nov 2026 |
-| Q43 | How does the app learn the local date where the employee is? | Data flow, API contract, TR-25 | AI Developer | Open | 27 Nov 2026 |
+| Q42 | Which names must the new Workday report use for the work email, the date and the days left? | Data flow, Integrations, TR-43 | AI Developer | Open. Asked in chat, and the AI Developer chose no option. | 27 Nov 2026 |
+| Q43 | How does the app learn the local date where the employee is? | Data flow, API contract, TR-25 | AI Developer | Open. Asked in chat, and the AI Developer chose no option. | 27 Nov 2026 |
