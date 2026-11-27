@@ -11,7 +11,7 @@ Each user type has at least one journey.
 | Customer | Learn a store rule | FR-01, FR-04, FR-12, FR-14, FR-21, FR-22, FR-24, FR-25, FR-32 |
 | Customer | Get billing help | FR-10, FR-13, FR-23, FR-26, FR-27, FR-28, FR-29, FR-30, FR-31, FR-32 |
 | Order desk visitor | Review the orders | FR-41, FR-42, FR-43, FR-44, FR-45, FR-46 |
-| Employee | See leave days left | FR-47, FR-51, FR-52, FR-53, FR-54, FR-55, FR-56, FR-57, FR-58, FR-59 |
+| Employee | See leave days left | FR-47, FR-51, FR-52, FR-53, FR-54, FR-55, FR-56, FR-57, FR-58, FR-59, FR-63 |
 
 ## Customer: check on an order
 When: a customer wants news of an order.
@@ -147,6 +147,7 @@ Done when: the employee has read their leave days left.
 
 If things go differently:
 - 2a. The company sign-in does not identify the person: the app shows the unavailable message; journey ends. (FR-59)
+- 2b. A leave sign-in still lasts: the app asks for no new company sign-in; back to step 3. (FR-63)
 - 3a. The app cannot read the HR system: the app shows the unavailable message; journey ends. (FR-58)
 - 3b. The HR system does not give exactly one balance: the app shows the unavailable message; journey ends. (FR-57)
 
@@ -157,6 +158,8 @@ flowchart TD
   s3 --> s4["Step 4: The app shows the leave days left that the HR system records as remaining today"]
   s4 --> s5["Step 5: Employee reads the number of leave days left"]
   s2 -.-> x2a["Step 2a: The company sign-in does not identify the person"]
+  s2 -.-> x2b["Step 2b: A leave sign-in still lasts"]
+  x2b -.-> s3
   s3 -.-> x3a["Step 3a: The app cannot read the HR system"]
   s3 -.-> x3b["Step 3b: The HR system does not give exactly one balance"]
 ```
