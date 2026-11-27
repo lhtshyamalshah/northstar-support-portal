@@ -152,9 +152,9 @@ These rows record answered questions, points with no source, and behaviour today
 | Q3 | Where do the leave numbers come from? | FR-52, Terms | Requester | Existing HR system. | 27 Nov 2026 |
 | Q4 | Which leave does the number count, and over which leave year? | FR-47, Terms, Out of scope | Requester | Annual leave only, over the calendar year January to December. | 27 Nov 2026 |
 | Q5 | What does the leave days page offer besides the days left? | FR-47, Out of scope | Requester | Nothing else. | 27 Nov 2026 |
-| Q6 | What does an employee see when the app has no leave number for them? | FR-47 | Requester | Open | 27 Nov 2026 |
+| Q6 | What does an employee see when the app has no leave number for them? | FR-47 | Requester | Open. Asked in chat, and the requester chose no option. | 27 Nov 2026 |
 | Q7 | How do employees reach the new page, given that customers use the same app? | FR-51, FR-53, Must never | Requester | Link on support page: anyone sees the link, but the page needs company sign-in. | 27 Nov 2026 |
-| Q8 | The order desk shows customer names and totals to anyone, and the support page links to it. Who is it for? | FR-41, FR-42, FR-46, Users | Requester | Open | 27 Nov 2026 |
+| Q8 | The order desk shows customer names and totals to anyone, and the support page links to it. Who is it for? | FR-41, FR-42, FR-46, Users | Requester | Open. Asked in chat, and the requester chose no option. | 27 Nov 2026 |
 | Q9 | Anyone who types an order ID gets its details, and Track an order names sample order NS-1002. Is that intended? | FR-03, FR-16 | Requester | Open | 27 Nov 2026 |
 | Q10 | Any four digits count as an order ID. One unknown ID also blocks later messages in that chat. Keep this? | FR-17, FR-19 | Requester | Open | 27 Nov 2026 |
 | Q11 | Chats with the same opening message share one chat count, and long chats start another. An older check expects 8 lookups, not 10. How must limits count? | FR-36, FR-37, Terms | Requester | Open | 27 Nov 2026 |
@@ -165,11 +165,11 @@ These rows record answered questions, points with no source, and behaviour today
 | Q16 | Which company sign-in service do employees use? | FR-51, Terms | Requester | Microsoft Entra ID. | 27 Nov 2026 |
 | Q17 | Which HR system holds the leave records? | FR-52, Terms | Requester | Workday. | 27 Nov 2026 |
 | Q18 | Does the page show the HR system's days left as recorded, or must the app work them out? | FR-47, FR-52, Terms | Requester | HR system's number: show exactly what it records as remaining. | 27 Nov 2026 |
-| Q19 | What does an employee see when the company sign-in or the HR system is unavailable? | FR-47, FR-51, FR-52 | Requester | Open | 27 Nov 2026 |
+| Q19 | What does an employee see when the company sign-in or the HR system is unavailable? | FR-47, FR-51, FR-52 | Requester | Open. Asked in chat, and the requester chose no option. | 27 Nov 2026 |
 | Q20 | Workday keeps a time off balance in days or in hours. What must the page show if annual leave is in hours? | FR-52, Terms | Requester | Kept in days: annual leave is already in days, so hours do not arise. | 27 Nov 2026 |
 | Q21 | Workday gives a balance as of a chosen date. Which date's remaining number must the page show? | FR-52, Terms | Requester | Today. | 27 Nov 2026 |
 | Q22 | What must the page show if Workday holds more than one annual leave balance for an employee? | FR-52, Terms | Requester | Only ever one: each employee has a single annual leave balance. | 27 Nov 2026 |
-| Q23 | Anyone sees the leave days link. What does a person see who cannot complete the company sign-in? | FR-51, FR-53 | Requester | Open | 27 Nov 2026 |
+| Q23 | Anyone sees the leave days link. What does a person see who cannot complete the company sign-in? | FR-51, FR-53 | Requester | Open. Asked in chat, and the requester chose no option. | 27 Nov 2026 |
 
 ## Sources
 - S1: The request, 27 Nov 2026: "Write the requirements for this app as it is today, plus one new page where an employee sees how many leave days they have left."
