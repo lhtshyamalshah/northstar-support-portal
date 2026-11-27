@@ -141,7 +141,7 @@ Done when: the employee has read their leave days left.
 
 1. Employee opens the leave days page. (FR-47)
 2. The app identifies the employee through the company sign-in. (FR-51)
-3. The app shows the employee's leave days left, using the HR system. (FR-47, FR-52)
+3. The app shows the leave days left that the HR system records as remaining. (FR-47, FR-52)
 4. Employee reads the number of leave days left.
 
 If things go differently:
@@ -152,7 +152,7 @@ If things go differently:
 ```mermaid
 flowchart TD
   s1["Step 1: Employee opens the leave days page"] --> s2["Step 2: The app identifies the employee through the company sign-in"]
-  s2 --> s3["Step 3: The app shows the employee's leave days left, using the HR system"]
+  s2 --> s3["Step 3: The app shows the leave days left that the HR system records as remaining"]
   s3 --> s4["Step 4: Employee reads the number of leave days left"]
   s2 -.-> x2a["Step 2a: The company sign-in is unavailable"]
   s3 -.-> x3a["Step 3a: The HR system is unavailable"]
